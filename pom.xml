@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+            
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.4.2</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+  
+  <groupId>com.gitub.sats17</groupId>
+  <artifactId>tiny-saga</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>tiny-saga-parent</name>
+    
+  <url>https://github.com/sats17/tiny-saga</url>
+  
+  <properties>    
+    <java.version>11</java.version>
+    <maven.compiler.source>11</maven.compiler.source>    
+    <maven.compiler.target>11</maven.compiler.target>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        </plugin>
+    </plugins>
+  </build>
+  
+  <modules>
+    <module>tiny-saga-order-ms</module>
+    <module>tiny-saga-payment-ms</module>
+    <module>tiny-saga-inventory-ms</module>
+    <module>tiny-saga-wallet-ms</module>      
+  </modules>
+</project>
