@@ -45,6 +45,8 @@
     <module>tiny-saga-order-ms</module>
     <module>tiny-saga-payment-ms</module>
     <module>tiny-saga-inventory-ms</module>
-    <module>tiny-saga-wallet-ms</module>      
+    <module>tiny-saga-wallet-ms</module>
+    <module>tiny-saga-heal-ms</module>
+    <module>tiny-saga-orchestrator-ms</module>
   </modules>
 </project>
