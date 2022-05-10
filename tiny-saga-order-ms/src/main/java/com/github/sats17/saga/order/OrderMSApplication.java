@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.github.sats17.saga.order.model.Order;
+import com.github.sats17.saga.order.model.db.Order;
 import com.github.sats17.saga.order.repository.OrderRepository;
 
 

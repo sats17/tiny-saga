@@ -1,4 +1,4 @@
-package com.github.sats17.saga.order.model;
+package com.github.sats17.saga.order.model.db;
 
 import com.github.sats17.saga.order.enums.Status;
 

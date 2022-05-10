@@ -1,4 +1,4 @@
-package com.github.sats17.saga.order.model;
+package com.github.sats17.saga.order.model.db;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
