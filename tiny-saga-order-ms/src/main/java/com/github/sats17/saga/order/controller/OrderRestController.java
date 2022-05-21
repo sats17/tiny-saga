@@ -1,8 +1,7 @@
 package com.github.sats17.saga.order.controller;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.sats17.saga.order.model.db.Order;
 import com.github.sats17.saga.order.model.request.CreateOrderSchema;
+import com.github.sats17.saga.order.model.response.FinalResponse;
 import com.github.sats17.saga.order.service.OrderService;
+import com.github.sats17.saga.order.utils.ApiResponseUtility;
 import com.github.sats17.saga.order.utils.OrderUtils;
 
 /**
@@ -29,14 +30,14 @@ public class OrderRestController {
 	public OrderService orderService;
 
 	@PostMapping()
-	public String createOrder( @RequestBody CreateOrderSchema orderSchema) {
+	public ResponseEntity<FinalResponse<Order>> createOrder( @RequestBody CreateOrderSchema orderSchema) throws Exception {
 		Long orderId = OrderUtils.generateOrderId();
-		return orderService.createOrder(orderId, orderSchema.getUserId(), orderSchema.getProductId());
+		return ApiResponseUtility.successResponseCreator(orderService.createOrder(orderId, orderSchema.getUserId(), orderSchema.getProductId()));
 	}
 	
 	@GetMapping("/{orderId}")
-	public Optional<Order> getOrder( @PathVariable Long orderId) {
-		return orderService.getOrder(orderId);
+	public ResponseEntity<FinalResponse<Order>> getOrder( @PathVariable Long orderId) throws Exception {
+		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
 	}
 
 }

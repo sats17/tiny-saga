@@ -16,7 +16,7 @@ public class OrderService {
 	@Autowired
 	OrderRepository orderRepository;
 	
-	public String createOrder(Long orderId, String userId, Long productId) {
+	public Order createOrder(Long orderId, String userId, Long productId) throws Exception {
 		Order order = new Order();
 		order.setOrderId(orderId);
 		order.setProductId(productId);
@@ -28,15 +28,20 @@ public class OrderService {
 		order.setOrderStatus(orderStatus);
 		Order responseOrder = orderRepository.save(order);
 		if(responseOrder.getOrderId() != null) {
-			return responseOrder.getOrderId().toString();
+			return responseOrder;
 		} else {
-			return "Order failed";
+			throw new Exception("Order creation failed");
 		}
 		
 	}
 
-	public Optional<Order> getOrder(Long orderId) {
-		return orderRepository.findById(orderId);
+	public Order getOrder(Long orderId) throws Exception {
+		Optional<Order> order = orderRepository.findById(orderId);
+		 if(order.isPresent()) {
+			 return order.get();
+		 } else {
+			 throw new Exception("Order not found");
+		 }
 	}
 
 }

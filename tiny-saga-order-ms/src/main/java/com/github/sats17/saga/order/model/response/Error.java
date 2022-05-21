@@ -1,38 +1,60 @@
 package com.github.sats17.saga.order.model.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Error {
 
-	private Integer errorCode;
-	private String errorType;
-	private String errorMessage;
+	private Integer resultCode;
+	private String resultType;
+	private String message;
+	private String httpMethod;
+	private String httpRequestURI;
 
-	public Integer getErrorCode() {
-		return errorCode;
+	public Integer getResultCode() {
+		return resultCode;
 	}
 
-	public void setErrorCode(Integer errorCode) {
-		this.errorCode = errorCode;
+	public void setResultCode(Integer resultCode) {
+		this.resultCode = resultCode;
 	}
 
-	public String getErrorType() {
-		return errorType;
+	public String getResultType() {
+		return resultType;
 	}
 
-	public void setErrorType(String errorType) {
-		this.errorType = errorType;
+	public void setResultType(String resultType) {
+		this.resultType = resultType;
 	}
 
-	public String getErrorMessage() {
-		return errorMessage;
+	public String getMessage() {
+		return message;
 	}
 
-	public void setErrorMessage(String errorMessage) {
-		this.errorMessage = errorMessage;
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public String getHttpMethod() {
+		return httpMethod;
+	}
+
+	public void setHttpMethod(String httpMethod) {
+		this.httpMethod = httpMethod;
+	}
+
+	public String getHttpRequestURI() {
+		return httpRequestURI;
+	}
+
+	public void setHttpRequestURI(String httpRequestURI) {
+		this.httpRequestURI = httpRequestURI;
 	}
 
 	@Override
 	public String toString() {
-		return "Error [errorCode=" + errorCode + ", errorType=" + errorType + ", errorMessage=" + errorMessage + "]";
+		return "Error [resultCode=" + resultCode + ", resultType=" + resultType + ", message=" + message
+				+ ", httpMethod=" + httpMethod + ", httpRequestURI=" + httpRequestURI + "]";
 	}
 
 }

@@ -4,40 +4,46 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+/**
+ * Status class contains information about your payload
+ * 
+ * @author sats17
+ *
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Status {
 
-	private Integer code;
-	private String type;
-	private List<Error> errors = null;
+	private Integer rootCode;
+	private String rootType;
+	private String service;
 
-	public Integer getCode() {
-		return code;
+	public Integer getRootCode() {
+		return rootCode;
 	}
 
-	public void setCode(Integer code) {
-		this.code = code;
+	public void setRootCode(Integer rootCode) {
+		this.rootCode = rootCode;
 	}
 
-	public String getType() {
-		return type;
+	public String getRootType() {
+		return rootType;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setRootType(String string) {
+		this.rootType = string;
 	}
 
-	public List<Error> getErrors() {
-		return errors;
+	public String getService() {
+		return service;
 	}
 
-	public void setErrors(List<Error> errors) {
-		this.errors = errors;
+	public void setService(String service) {
+		this.service = service;
 	}
 
 	@Override
 	public String toString() {
-		return "Status [code=" + code + ", type=" + type + ", errors=" + errors + "]";
+		return "Status [rootCode=" + rootCode + ", rootType=" + rootType + ", service=" + service + "]";
 	}
 
 }
