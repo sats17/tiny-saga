@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.sats17.saga.order.enums.Status;
 import com.github.sats17.saga.order.model.db.Order;
 import com.github.sats17.saga.order.model.db.OrderStatus;
@@ -15,6 +17,11 @@ public class OrderService {
 	
 	@Autowired
 	OrderRepository orderRepository;
+	
+	@Autowired
+	KafkaService kafkaService;
+	
+	ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
 	
 	public Order createOrder(Long orderId, String userId, Long productId) throws Exception {
 		Order order = new Order();
@@ -28,6 +35,7 @@ public class OrderService {
 		order.setOrderStatus(orderStatus);
 		Order responseOrder = orderRepository.save(order);
 		if(responseOrder.getOrderId() != null) {
+			kafkaService.publish(writer.writeValueAsString(responseOrder));
 			return responseOrder;
 		} else {
 			throw new Exception("Order creation failed");
