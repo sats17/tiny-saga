@@ -18,9 +18,6 @@ public class OrderService {
 	@Autowired
 	OrderRepository orderRepository;
 	
-	@Autowired
-	KafkaService kafkaService;
-	
 	ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
 	
 	public Order createOrder(Long orderId, String userId, Long productId) throws Exception {
@@ -35,7 +32,7 @@ public class OrderService {
 		order.setOrderStatus(orderStatus);
 		Order responseOrder = orderRepository.save(order);
 		if(responseOrder.getOrderId() != null) {
-			kafkaService.publish(writer.writeValueAsString(responseOrder));
+//			kafkaService.publish(writer.writeValueAsString(responseOrder));
 			return responseOrder;
 		} else {
 			throw new Exception("Order creation failed");

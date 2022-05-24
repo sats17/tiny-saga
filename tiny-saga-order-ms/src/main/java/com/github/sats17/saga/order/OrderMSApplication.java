@@ -18,6 +18,9 @@ public class OrderMSApplication {
     public static void main( String[] args )
     {
     	SpringApplication.run(OrderMSApplication.class, args);
+    	while(true) {
+    		System.out.println("Hi from true");
+    	}
     }
     
     @Bean
