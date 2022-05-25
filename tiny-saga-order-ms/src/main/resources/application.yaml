@@ -5,3 +5,13 @@ server.port: 8081
 spring:
   application:
     name: tiny-saga-order-ms
+  kafka:
+    producer:
+        bootstrap-servers: localhost:9081
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    admin:
+      fail-fast: true
+    
+kafka:
+  bootstrapAddress: localhost:90123

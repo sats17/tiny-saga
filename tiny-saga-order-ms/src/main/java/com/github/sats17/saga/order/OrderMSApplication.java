@@ -3,8 +3,10 @@ package com.github.sats17.saga.order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
+import com.github.sats17.saga.order.controller.OrderRestController;
 import com.github.sats17.saga.order.model.db.Order;
 import com.github.sats17.saga.order.repository.OrderRepository;
 
@@ -17,10 +19,7 @@ public class OrderMSApplication {
 	
     public static void main( String[] args )
     {
-    	SpringApplication.run(OrderMSApplication.class, args);
-    	while(true) {
-    		System.out.println("Hi from true");
-    	}
+    	ConfigurableApplicationContext test  = SpringApplication.run(OrderMSApplication.class, args);
     }
     
     @Bean
