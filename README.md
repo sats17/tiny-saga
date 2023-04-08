@@ -57,6 +57,18 @@ Payment page
 * The Payment MS communicates with the Wallet MS to check if the wallet has enough balance. If so, it subtracts the required amount and confirms the payment.
 * Payment MS then publishes an event to Kafka, which both the Order MS and Inventory MS listen to.
 
+## Database
+
+### 1) Order DB
+* OrderId: A unique identifier for the order (Primary Key).
+* UserId: A reference to the user who placed the order (Foreign Key).
+* OrderStatus: An ENUM field representing the order status (e.g., Initialized, Placed, Failed, Delivered, On-Way, Canceled).
+* ProductId: A reference to the product being ordered (Foreign Key).
+* Quantity: The number of units of the product being ordered.
+* Price: The cost of the product at the time the order was placed.
+* createdAt: Order creation date
+* updateAt: Order update date
+
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS?
 * Once the Order MS receives the event, how will it update the order status, and what other actions will it perform?
