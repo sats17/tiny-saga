@@ -58,8 +58,8 @@ Payment page
 * Payment MS then publishes an event to Kafka, which both the Order MS and Inventory MS listen to.
 
 ## Questions and Considerations
-What specific information will be included in the event published to Kafka by the Payment MS?
-Once the Order MS receives the event, how will it update the order status, and what other actions will it perform?
-Similarly, when the Inventory MS receives the event, how will it update the stock levels and ensure product availability?
-How will the system handle scenarios when the wallet does not have enough balance to complete the order?
-How you will handle system failure between payment ms and wallet ms ? -> We will use retry with exponential backoff logic, once limit of retry reached then we will send error to client. And we will mark order as fail.
+* What specific information will be included in the event published to Kafka by the Payment MS?
+* Once the Order MS receives the event, how will it update the order status, and what other actions will it perform?
+* Similarly, when the Inventory MS receives the event, how will it update the stock levels and ensure product availability?
+* How will the system handle scenarios when the wallet does not have enough balance to complete the order?
+* How you will handle system failure between payment ms and wallet ms ? -> We will use retry with exponential backoff logic, once limit of retry reached then we will send error to client. And we will mark order as fail.
