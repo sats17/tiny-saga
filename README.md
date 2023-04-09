@@ -52,22 +52,44 @@ Payment page
 * The user places an order, and the request goes through the API gateway to the Order MS.
 * The Order MS creates a new order in the database, sets the order status to "Initiated," and returns the order details to the user.
 
-### Traditional Payment Flow
+### 2) Traditional Payment Flow
 * The user initiates the order, and the request goes through the API gateway to the Payment MS.
 * The Payment MS communicates with the Wallet MS to check if the wallet has enough balance. If so, it subtracts the required amount and confirms the payment.
 * Payment MS then publishes an event to Kafka, which both the Order MS and Inventory MS listen to.
+
+### 3) Insufficient fund flow
+* Wallet MS throws error to payment MS with insufficent fund
+* Payment MS will trigger event to kafa and order MS will receive event with insufficent flow
+* Order MS will update status of order.
+
+
+
+
 
 ## Database
 
 ### 1) Order DB
 * OrderId: A unique identifier for the order (Primary Key).
 * UserId: A reference to the user who placed the order (Foreign Key).
-* OrderStatus: An ENUM field representing the order status (e.g., Initialized, Placed, Failed, Delivered, On-Way, Canceled).
+* OrderStatus: An ENUM field representing the order status (e.g., InitializedOrder, PaymentDone, Placed, Failed, Delivered, On-Way, Canceled).
 * ProductId: A reference to the product being ordered (Foreign Key).
 * Quantity: The number of units of the product being ordered.
 * Price: The cost of the product at the time the order was placed.
 * createdAt: Order creation date
 * updateAt: Order update date
+* StatusInfo: Tells more information about status.
+
+### 2) Inventory DB
+* ProductId: A unique identifier for the product (Primary Key).
+* ProductName: The name or title of the product.
+* ProductType: The category or type of the product (e.g., electronics, clothing, etc.).
+* AvailableProductCount: The number of available units of the product in the inventory.
+
+### 3) Wallet DB
+* UserId: A unique identifier for the user (Primary Key). This field can be a foreign key referencing the user's ID in your User table or User microservice.
+* Amount: The current balance of the user's wallet.
+
+
 
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS?
