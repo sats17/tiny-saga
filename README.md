@@ -48,11 +48,7 @@ Payment page
 
 ## API User Flows
 
-### 1) Place a order
-* The user places an order, and the request goes through the API gateway to the Order MS.
-* The Order MS creates a new order in the database, sets the order status to "Initiated," and returns the order details to the user.
-
-### 2) Traditional Payment Flow
+### 1) Place a order with Traditional Payment Flow
 * ~~The user initiates the order, and the request goes through the API gateway to the Payment MS.~~
 * In Place a order flow will call payment ms with particular payment type. (Wallet, UPI)
 * If wallet MS then,
