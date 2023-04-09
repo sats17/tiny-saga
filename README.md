@@ -89,6 +89,17 @@ Payment page
 * UserId: A unique identifier for the user (Primary Key). This field can be a foreign key referencing the user's ID in your User table or User microservice.
 * Amount: The current balance of the user's wallet.
 
+### 4) Transaction DB
+* TransactionId: A unique identifier for the transaction (Primary Key).
+* UserId: The ID of the user associated with the transaction. This field can be a foreign key referencing the UserId in the User table or User microservice.
+* OrderId: The ID of the associated order (if applicable). This field can be a foreign key referencing the OrderId in the Order database or can be NULL for transactions not related to orders (e.g., deposits and withdrawals).
+* TransactionType: The type of transaction (e.g., Deposit, Withdrawal, Payment).
+* PaymentStatus: The status of the payment transaction, if applicable (e.g., Pending, Completed, Failed, Refunded). This field can be NULL for non-payment transactions (e.g., deposits and withdrawals).
+* Amount: The amount of the transaction.
+* Currency: The currency used for the transaction (e.g., USD, EUR, GBP).
+* Timestamp: The date and time when the transaction occurred.
+* Description: A brief description or note about the transaction (optional).
+
 
 
 ## Questions and Considerations
