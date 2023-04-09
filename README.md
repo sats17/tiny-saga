@@ -53,13 +53,16 @@ Payment page
 * The Order MS creates a new order in the database, sets the order status to "Initiated," and returns the order details to the user.
 
 ### 2) Traditional Payment Flow
-* The user initiates the order, and the request goes through the API gateway to the Payment MS.
+* ~~The user initiates the order, and the request goes through the API gateway to the Payment MS.~~
+* In Place a order flow will call payment ms with particular payment type. (Wallet, UPI)
+* If wallet MS then,
 * The Payment MS communicates with the Wallet MS to check if the wallet has enough balance. If so, it subtracts the required amount and confirms the payment.
 * Payment MS then publishes an event to Kafka, which both the Order MS and Inventory MS listen to.
 
 ### 3) Insufficient fund flow
 * Wallet MS throws error to payment MS with insufficent fund
-* Payment MS will trigger event to kafa and order MS will receive event with insufficent flow
+* ~~Payment MS will trigger event to kafa and order MS will receive event with insufficent flow~~
+* Payment MS will just return API call to order MS.
 * Order MS will update status of order.
 
 
@@ -108,3 +111,5 @@ Payment page
 * Similarly, when the Inventory MS receives the event, how will it update the stock levels and ensure product availability?
 * How will the system handle scenarios when the wallet does not have enough balance to complete the order? -> It will simple error throw to client and publish event with order fail.
 * How you will handle system failure between payment ms and wallet ms ? -> We will use retry with exponential backoff logic, once limit of retry reached then we will send error to client. And we will mark order as fail.
+* If inventory ms do not have item left -> Early fail will be bettter. Order MS will check in inventory ms if any stock available or not.
+
