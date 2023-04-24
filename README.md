@@ -1,4 +1,4 @@
-# Tiny-Saga
+# Tiny-Saga (In progress)
 Proof of concept implementation of microservices saga pattern.
 
 ## Draft Version 1.0.0
