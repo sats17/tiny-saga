@@ -62,6 +62,19 @@ Payment page
 * Payment MS will just return API call to order MS.
 * Order MS will update status of order. Either by email or SSE.
 
+### 3) Inventory Reserved flow after payment success -
+* When payment is done, then payment ms will create event PaymentSucceeded which will listen by order ms and inventory ms.
+* The Inventory microservice listens for the "PaymentSucceeded" event. Upon receiving the event, it checks if there is enough stock for the ordered product. If there is enough stock, it reserves the items for the order and publishes an "InventoryReserved" event. If there isn't enough stock, it publishes an "InventoryInsufficient" event.
+* The Order microservice listens for the "InventoryReserved", "InventoryInsufficient", and "PaymentFailed" events. It updates the order status accordingly:
+"InventoryReserved": updates the order status to "Placed".
+"InventoryInsufficient": updates the order status to "Failed" and stores the reason for the failure (insufficient inventory).
+"PaymentFailed": updates the order status to "Failed" and stores the reason for the failure (payment-related issues).
+
+### 4) Inventory insufficient flow and refund payment -
+* When the Inventory microservice publishes the "InventoryInsufficient" event, the Payment microservice listens for this event.
+* Upon receiving the "InventoryInsufficient" event, the Payment microservice initiates a refund process by calling the Wallet microservice to credit the amount back to the user's wallet. Once the refund is successful, the Payment microservice publishes a "RefundSucceeded" event. If the refund fails for any reason, it publishes a "RefundFailed" event with a reason.
+* The Order microservice listens for the "RefundSucceeded" and "RefundFailed" events. If it receives a "RefundSucceeded" event, it updates the order status to "Failed" with a reason indicating that the inventory was insufficient, and the refund was successful. If it receives a "RefundFailed" event, it updates the order status to "Failed" and stores the reason for the failure (inventory insufficiency and refund-related issues).
+
 
 
 
