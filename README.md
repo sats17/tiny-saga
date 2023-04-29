@@ -48,18 +48,19 @@ Payment page
 
 ## API User Flows
 
-### 1) Place a order with Traditional Payment Flow
-* ~~The user initiates the order, and the request goes through the API gateway to the Payment MS.~~
-* In Place a order flow will call payment ms with particular payment type. (Wallet, UPI)
-* If wallet MS then,
+### 1) Place a order with wallet payment mode
+* ~~The user initiates the order, and the request goes through the API gateway to the Order MS.~~
+* The Order microservice receives a request to create an order. It creates an order with the status "Initiated" and publishes an "OrderInitiated" event.
+* The Payment microservice listens for the "OrderInitiated" event. Upon receiving the event, it attempts to process the payment by calling HTTP call to the Wallet microservice. If the payment is successful, it publishes a "PaymentSucceeded" event. If the payment fails, it publishes a "PaymentFailed" event with a reason.
 * The Payment MS communicates with the Wallet MS to check if the wallet has enough balance. If so, it subtracts the required amount and confirms the payment.
-* Payment MS then publishes an event to Kafka, which both the Order MS and Inventory MS listen to.
+* Payment MS then publishes an event to Kafka, which both the Order MS and Inventory MS(Need to check for inventory) listen to.
+* The Order microservice listens for both the "PaymentSucceeded" and "PaymentFailed" events. If it receives a "PaymentSucceeded" event, it updates the order status to "PaymentDone". If it receives a "PaymentFailed" event, it updates the order status to "Failed" and stores the reason for the failure.
 
-### 3) Insufficient fund flow
+### 2) Insufficient fund flow for wallet payment mode (Insufficient fund while placing order) -
 * Wallet MS throws error to payment MS with insufficent fund
 * ~~Payment MS will trigger event to kafa and order MS will receive event with insufficent flow~~
 * Payment MS will just return API call to order MS.
-* Order MS will update status of order.
+* Order MS will update status of order. Either by email or SSE.
 
 
 
