@@ -108,4 +108,5 @@ Payment page
 * How will the system handle scenarios when the wallet does not have enough balance to complete the order? -> It will simple error throw to client and publish event with order fail.
 * How you will handle system failure between payment ms and wallet ms ? -> We will use retry with exponential backoff logic, once limit of retry reached then we will send error to client. And we will mark order as fail.
 * If inventory ms do not have item left -> Early fail will be bettter. Order MS will check in inventory ms if any stock available or not.
+* Why we discarded approach of separte flow of order placed and payment ? -> To avoid incosistency of payment faliure, and get early failback. When user click on place order with payment mode frontend send request to order ms with payment type(wallet, upi). Using this we can avoid incosistency.
 
