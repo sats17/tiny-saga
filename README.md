@@ -41,10 +41,11 @@ Key operations:
 This microservice is responsible for coordinating the actions of other microservices using the saga pattern.
 
 ## UI User flow
-1) User clicks on order -> Backend /api/order/{id} -> After making status of order to initated, page will route to
-Payment page
-2) User clicks on payment -> Backend /api/payment -> API will trigger and do payment from wallet. Validation if there is no amount available.
-
+~~1) User clicks on order -> Backend /api/order/{id} -> After making status of order to initated, page will route to
+Payment page~~
+~~2) User clicks on payment -> Backend /api/payment -> API will trigger and do payment from wallet. Validation if there is no amount available.~~
+1) User clicks on order with selected payment mode -> Backend call will be trigger, it will take payment and place order (edge cases of insufficient fund or inventory insufficient are async flow)
+2) For wallet payment mode -> Wallet payment mode will be disable, if user have insufficient fund. -> Backend will call to wallet ms to check user funds.
 
 ## API User Flows
 
