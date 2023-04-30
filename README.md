@@ -128,7 +128,9 @@ Payment page~~
     "orderId": "12345",
     "userId": "67890",
     "orderStatus": "Initiated",
-    "paymentType": "wallet"
+    "paymentType": "wallet",
+    "productId" : "123asf-sfa-2a"
+    "productQuantity": 2
   }
 }
 ```
@@ -149,7 +151,9 @@ Payment page~~
     "userId": "67890",
     "orderStatus": "paymentDone",
     "paymentType": "wallet",
-    "transactionId": "550sf1100-e29b-41d4-a716-446655440000"
+    "transactionId": "550sf1100-e29b-41d4-a716-446655440000",
+    "productId" : "123asf-sfa-2a"
+    "productQuantity": 2
   }
 }
 ```
