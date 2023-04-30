@@ -141,7 +141,7 @@ Payment page~~
 {
   "eventId": "550e8400-e29b-41d4-a716-446655440000",
   "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
-  "eventName": "Payment_Done",
+  "eventName": "paymentDone",
   "version": "1.0",
   "timestamp": "2023-05-01T12:34:56Z",
    "orderId": "12345",
@@ -162,7 +162,7 @@ Payment page~~
 {
   "eventId": "550e8400-e29b-41d4-a716-446655440000",
   "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
-  "eventName": "Payment_Fail",
+  "eventName": "paymentFail",
   "version": "1.0",
   "timestamp": "2023-05-01T12:34:56Z",
   "orderId": "12345",
@@ -175,6 +175,49 @@ Payment page~~
 ```
 * triggered by = Payment MS
 * Listen by = Order MS
+
+### Inventory Reserved event
+* payload
+```
+{
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
+  "eventName": "inventoryReserved",
+  "version": "1.0",
+  "timestamp": "2023-05-01T12:34:56Z",
+  "orderId": "12345",
+  "userId": "67890",
+  "orderStatus": "inventoryReserved",
+  "paymentType": "wallet",
+  "transactionId": "550sf1100-e29b-41d4-a716-446655440000",
+   "productId" : "123asf-sfa-2a",
+   "productQuantity": 2
+}
+```
+* triggered by = Inventory MS
+* Listen by = Order MS
+
+### Inventory Insufficient event
+* payload
+```
+{
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
+  "eventName": "inventoryInsufficient",
+  "version": "1.0",
+  "timestamp": "2023-05-01T12:34:56Z",
+  "orderId": "12345",
+  "userId": "67890",
+  "orderStatus": "inventoryInsufficient",
+  "paymentType": "wallet",
+  "transactionId": "550sf1100-e29b-41d4-a716-446655440000",
+  "productId" : "123asf-sfa-2a",
+  "productQuantity": 2,
+  "isPartialOrder": false // Indicates when some amount of quantity is available
+}
+```
+* triggered by = Inventory MS
+* Listen by = Order MS, Payment MS
 
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS?
