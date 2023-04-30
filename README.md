@@ -115,7 +115,25 @@ Payment page~~
 * Description: A brief description or note about the transaction (optional).
 
 ## Events payload
-??
+### Order_Initiated event
+* payload
+```
+{
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef15b7f6",
+  "eventName": "Order_Initiated",
+  "version": "1.0",
+  "timestamp": "2023-05-01T12:34:56Z",
+  "payload": {
+    "orderId": "12345",
+    "userId": "67890",
+    "orderStatus": "Initiated",
+    "paymentType": "wallet"
+  }
+}
+```
+* triggered by = Order MS
+* Listen by = Payment MS
 
 
 
