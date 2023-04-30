@@ -135,7 +135,48 @@ Payment page~~
 * triggered by = Order MS
 * Listen by = Payment MS
 
+### Payment_Done event
+* payload
+```
+{
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
+  "eventName": "Payment_Done",
+  "version": "1.0",
+  "timestamp": "2023-05-01T12:34:56Z",
+  "payload": {
+    "orderId": "12345",
+    "userId": "67890",
+    "orderStatus": "paymentDone",
+    "paymentType": "wallet",
+    "transactionId": "550sf1100-e29b-41d4-a716-446655440000"
+  }
+}
+```
+* triggered by = Payment MS
+* Listen by = Order MS, Inventory MS
 
+### Payment_Fail event
+* payload
+```
+{
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
+  "eventName": "Payment_Fail",
+  "version": "1.0",
+  "timestamp": "2023-05-01T12:34:56Z",
+  "payload": {
+    "orderId": "12345",
+    "userId": "67890",
+    "orderStatus": "paymentFail",
+    "paymentType": "wallet",
+    "transactionId": "550sf1100-e29b-41d4-a716-446655440000"
+    "failReason": "insufficientFund" or "serverError"
+  }
+}
+```
+* triggered by = Payment MS
+* Listen by = Order MS
 
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS?
