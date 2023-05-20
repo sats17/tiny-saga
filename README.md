@@ -222,7 +222,8 @@ Payment page~~
 ## Kafka design
 * Single topic
 * Partitions ?
-* Consumer Groups for each application so multiple instance can receive only once.
+* Consumer Groups for each microservice, so multiple instance of microservice can receive only once message.
+* Application needs to ignore message if they are not consumer of that message, and those eventTypes or eventName will be configurable outside code.
 
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS?
