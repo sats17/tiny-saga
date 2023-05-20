@@ -219,6 +219,11 @@ Payment page~~
 * triggered by = Inventory MS
 * Listen by = Order MS, Payment MS
 
+## Kafka design
+* Single topic
+* Partitions ?
+* Consumer Groups for each application so multiple instance can receive only once.
+
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS?
 * Once the Order MS receives the event, how will it update the order status, and what other actions will it perform?
