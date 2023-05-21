@@ -1,17 +1,20 @@
 server.port: 8081
 
+# Spring boot performs autoconnection to embedded mongodb, hence even if no port provide it performs lookup.
 #spring.data.mongodb.port: 0
 
 spring:
   application:
     name: tiny-saga-order-ms
-  kafka:
-    producer:
-        bootstrap-servers: localhost:9081
-        key-serializer: org.apache.kafka.common.serialization.StringSerializer
-        value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    admin:
-      fail-fast: true
-    
+  # Below configuration for raw kafka connection  
+#  kafka:
+#    producer:
+#        bootstrap-servers: localhost:9081
+#        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+#    admin:
+#      fail-fast: true
+  
+# Below kafka configuration is for springboot based  
 kafka:
-  bootstrapAddress: localhost:90123
+  bootstrapAddress: 172.20.0.2:2181
