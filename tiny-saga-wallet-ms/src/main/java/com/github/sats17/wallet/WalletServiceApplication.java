@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import com.github.sats17.wallet.entity.Wallet;
 import com.github.sats17.wallet.entity.WalletRepository;
 
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@EnableSwagger2
 @SpringBootApplication
 public class WalletServiceApplication {
 	

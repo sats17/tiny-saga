@@ -7,22 +7,22 @@ REPLICATION_FACTOR=1
 
 # Check if the topic already exists
 docker run --rm -it \
-  --network=tiny-saga_default \
+  --network=infrastructure_default \
   confluentinc/cp-kafka \
-  kafka-topics --list \
-    --bootstrap-server kafka:9092 | grep -Fxq "${TOPIC_NAME}"
+  kafka-topics --describe \
+    --bootstrap-server kafka:9092 \
+    --topic ${TOPIC_NAME} > /dev/null 2>&1
 
-if [ $? -eq 0 ]; then
-  echo "Topic '${TOPIC_NAME}' already exists. Skipping topic creation."
-else
-  # Run the Kafka container and create the topic
-  # Get network name using "docker network ls" command
+# If the topic doesn't exist, create it
+if [ $? -ne 0 ]; then
   docker run --rm -it \
-    --network=tiny-saga_default \
+    --network=infrastructure_default \
     confluentinc/cp-kafka \
     kafka-topics --create \
       --bootstrap-server kafka:9092 \
       --topic ${TOPIC_NAME} \
       --partitions ${PARTITIONS} \
       --replication-factor ${REPLICATION_FACTOR}
+else
+  echo "Topic ${TOPIC_NAME} already exists."
 fi
