@@ -6,6 +6,7 @@ PARTITIONS=1
 REPLICATION_FACTOR=1
 
 # Check if the topic already exists
+# It creates a new container which uses kafka network and uses kafka host to connect kafka cluster.
 docker run --rm -it \
   --network=infrastructure_default \
   confluentinc/cp-kafka \

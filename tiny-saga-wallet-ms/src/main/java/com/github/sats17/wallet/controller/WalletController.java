@@ -15,11 +15,8 @@ import com.github.sats17.wallet.entity.Response;
 import com.github.sats17.wallet.entity.Wallet;
 import com.github.sats17.wallet.entity.WalletRepository;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 
 // http://localhost:8086/swagger-ui/index.html#/
-@Api(tags = "Wallet MS API")
 @RestController
 @RequestMapping("/v1/api/wallet")
 public class WalletController {
@@ -27,7 +24,6 @@ public class WalletController {
 	@Autowired
 	private WalletRepository walletRepository;
 
-	@ApiOperation("Get Wallet Amount")
 	@GetMapping("/amount")
 	public ResponseEntity<Response> getAmount(@RequestParam Long userId) {
 		Optional<Wallet> walletOptional = walletRepository.findById(userId);
@@ -41,7 +37,6 @@ public class WalletController {
 		}
 	}
 
-	@ApiOperation("Add Wallet Amount(Internal API)")
 	@PostMapping("/amount")
 	public ResponseEntity<Response> postAmount(@RequestParam Long userId, @RequestParam Double amount) {
 		Optional<Wallet> walletOptional = walletRepository.findById(userId);
@@ -57,7 +52,6 @@ public class WalletController {
 		}
 	}
 
-	@ApiOperation("Debit Wallet Amount")
 	@PostMapping("/debit")
 	public ResponseEntity<Response> debitAmount(@RequestParam Long userId, @RequestParam Double amount) {
 		Optional<Wallet> walletOptional = walletRepository.findById(userId);
