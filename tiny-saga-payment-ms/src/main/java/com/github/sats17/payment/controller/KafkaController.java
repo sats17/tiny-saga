@@ -28,9 +28,10 @@ public class KafkaController {
 	}
 
 	@KafkaListener(topics = { "order-topic" }, groupId = "${spring.kafka.group_id}")
-	public void consume(Object taskStatus) {
-
-		System.out.print(String.format("Task status is updated : " + taskStatus));
+	public void consume(String taskStatus) throws InterruptedException {
+		System.out.println("Triggered event");
+		System.out.print(taskStatus);
+		Thread.sleep(5000);
 	}
 
 }
