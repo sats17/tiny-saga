@@ -1,0 +1,9 @@
+server:
+  port: 8087
+  
+springdoc.api-docs.path: /payment-docs
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092
+    group_id: payment-ms

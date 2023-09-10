@@ -15,6 +15,8 @@ import com.github.sats17.wallet.entity.Response;
 import com.github.sats17.wallet.entity.Wallet;
 import com.github.sats17.wallet.entity.WalletRepository;
 
+
+// http://localhost:8086/swagger-ui/index.html#/
 @RestController
 @RequestMapping("/v1/api/wallet")
 public class WalletController {

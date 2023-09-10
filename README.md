@@ -129,7 +129,8 @@ Payment page~~
    "orderStatus": "Initiated",
    "paymentType": "wallet",
    "productId" : "123asf-sfa-2a"
-   "productQuantity": 2
+   "productQuantity": 2,
+   "amount": 1000
 }
 ```
 * triggered by = Order MS

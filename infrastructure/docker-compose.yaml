@@ -19,9 +19,13 @@ services:
       - zookeeper
     ports:
       - "9092:9092"
+      - "29092:29092" # Outside of docker network can access using this port. Such as local machine java app.
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
+# More information about networking -> https://www.baeldung.com/kafka-docker-connection
