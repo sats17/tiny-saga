@@ -121,16 +121,16 @@ Payment page~~
 {
   "eventId": "550e8400-e29b-41d4-a716-446655440000",
   "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef15b7f6",
-  "eventName": "orderInitiated",
+  "eventName": "ORDER_INITIATED",
   "version": "1.0",
   "timestamp": "2023-05-01T12:34:56Z",
   "orderId": "12345",
    "userId": "67890",
-   "orderStatus": "Initiated",
-   "paymentType": "wallet",
+   "orderStatus": "INITIATED",
+   "paymentType": "WALLET",
    "productId" : "123asf-sfa-2a"
    "productQuantity": 2,
-   "amount": 1000
+   "price": 1000
 }
 ```
 * triggered by = Order MS
@@ -142,13 +142,13 @@ Payment page~~
 {
   "eventId": "550e8400-e29b-41d4-a716-446655440000",
   "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
-  "eventName": "paymentDone",
+  "eventName": "PAYMENT_DONE",
   "version": "1.0",
   "timestamp": "2023-05-01T12:34:56Z",
    "orderId": "12345",
    "userId": "67890",
-   "orderStatus": "paymentDone",
-   "paymentType": "wallet",
+   "orderStatus": "PAYMENT_DONE",
+   "paymentType": "WALLET",
    "transactionId": "550sf1100-e29b-41d4-a716-446655440000",
    "productId" : "123asf-sfa-2a"
    "productQuantity": 2
@@ -163,13 +163,13 @@ Payment page~~
 {
   "eventId": "550e8400-e29b-41d4-a716-446655440000",
   "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
-  "eventName": "paymentFail",
+  "eventName": "PAYMENT_FAIL",
   "version": "1.0",
   "timestamp": "2023-05-01T12:34:56Z",
   "orderId": "12345",
   "userId": "67890",
-  "orderStatus": "paymentFail",
-  "paymentType": "wallet",
+  "orderStatus": "PAYMENT_FAIL",
+  "paymentType": "WALLET",
   "transactionId": "550sf1100-e29b-41d4-a716-446655440000"
   "failReason": "insufficientFund" or "serverError"
 }
@@ -183,13 +183,13 @@ Payment page~~
 {
   "eventId": "550e8400-e29b-41d4-a716-446655440000",
   "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
-  "eventName": "inventoryReserved",
+  "eventName": "INVENTORY_RESERVERVED",
   "version": "1.0",
   "timestamp": "2023-05-01T12:34:56Z",
   "orderId": "12345",
   "userId": "67890",
-  "orderStatus": "inventoryReserved",
-  "paymentType": "wallet",
+  "orderStatus": "INVENTORY_RESERVERVED",
+  "paymentType": "WALLET",
   "transactionId": "550sf1100-e29b-41d4-a716-446655440000",
    "productId" : "123asf-sfa-2a",
    "productQuantity": 2
@@ -204,13 +204,13 @@ Payment page~~
 {
   "eventId": "550e8400-e29b-41d4-a716-446655440000",
   "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
-  "eventName": "inventoryInsufficient",
+  "eventName": "INVENTORY_INSUFFICIENT",
   "version": "1.0",
   "timestamp": "2023-05-01T12:34:56Z",
   "orderId": "12345",
   "userId": "67890",
-  "orderStatus": "inventoryInsufficient",
-  "paymentType": "wallet",
+  "orderStatus": "INVENTORY_INSUFFICIENT",
+  "paymentType": "WALLET",
   "transactionId": "550sf1100-e29b-41d4-a716-446655440000",
   "productId" : "123asf-sfa-2a",
   "productQuantity": 2,

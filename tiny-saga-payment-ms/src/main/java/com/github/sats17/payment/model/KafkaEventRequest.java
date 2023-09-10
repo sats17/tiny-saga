@@ -1,5 +1,9 @@
 package com.github.sats17.payment.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class KafkaEventRequest {
 
 	private String eventId;
@@ -16,11 +20,19 @@ public class KafkaEventRequest {
 	private long price;
 
 	public enum EventName {
-		ORDER_INITIATED
+		ORDER_INITIATED,
+		PAYMENT_FAIL,
+		INVENTORY_INSUFFICIENT,
+		INVENTORY_RESERVERVED,
+		PAYMENT_DONE
 	}
 
 	public enum OrderStatus {
-		INITIATED
+		INITIATED,
+		PAYMENT_FAIL,
+		INVENTORY_INSUFFICIENT,
+		INVENTORY_RESERVERVED,
+		PAYMENT_DONE
 	}
 
 	public enum PaymentType {
