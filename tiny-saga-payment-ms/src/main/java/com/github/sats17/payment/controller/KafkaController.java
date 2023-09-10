@@ -1,18 +1,16 @@
 package com.github.sats17.payment.controller;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.sats17.payment.model.KafkaEventRequest;
 
 
 @RestController
@@ -26,12 +24,37 @@ public class KafkaController {
 	public String getHealthCheck() {
 		return "ok ok health";
 	}
+	
+	@Autowired
+	ObjectMapper mapper;
 
 	@KafkaListener(topics = { "order-topic" }, groupId = "${spring.kafka.group_id}")
-	public void consume(String taskStatus) throws InterruptedException {
-		System.out.println("Triggered event");
-		System.out.print(taskStatus);
-		Thread.sleep(5000);
+	public void consume(String event) throws InterruptedException {
+		KafkaEventRequest eventObj = null;
+		try {
+			eventObj = mapper.readValue(event, KafkaEventRequest.class);
+			System.out.println(eventObj.toString());
+			switch(eventObj.getEventName()) {
+			case ORDER_INITIATED:
+				processOrderInitatedEvent(eventObj);
+			case INVENTORY_INSUFFICIENT:
+				processInventoryInsufficientEvent(eventObj);
+			default:
+				System.out.println("Invalid event received");
+				break;
+			}
+		} catch (Exception e) {
+			System.out.println("Something went wrong in event => "+event);
+			System.out.println(e.getMessage());
+		}
 	}
 
+	private void processOrderInitatedEvent(KafkaEventRequest event) {
+		System.out.println("Processing order intiated event");
+	}
+	
+	private void processInventoryInsufficientEvent(KafkaEventRequest event) {
+		System.out.println("Processing inventory insufficient event");
+	}
+	
 }

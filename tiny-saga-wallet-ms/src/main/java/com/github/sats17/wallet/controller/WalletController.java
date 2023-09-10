@@ -29,10 +29,10 @@ public class WalletController {
 		Optional<Wallet> walletOptional = walletRepository.findById(userId);
 		if (walletOptional.isPresent()) {
 			Wallet wallet = walletOptional.get();
-			Response response = new Response(2000, wallet.getAmount(), "Amount fetched successfully.");
+			Response response = new Response(20000, wallet.getAmount(), "Amount fetched successfully.");
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		} else {
-			Response response = new Response(4000, "UserId not present in wallet.");
+			Response response = new Response(40002, "UserId not present in wallet.");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}
@@ -44,10 +44,10 @@ public class WalletController {
 			Wallet wallet = walletOptional.get();
 			wallet.setAmount(wallet.getAmount() + amount);
 			Wallet updatedWallet = walletRepository.save(wallet);
-			Response response = new Response(2000, updatedWallet.getAmount(), "Amount added successfully.");
+			Response response = new Response(20000, updatedWallet.getAmount(), "Amount added successfully.");
 			return ResponseEntity.status(HttpStatus.OK).body(response);
 		} else {
-			Response response = new Response(4000, "UserId not present in wallet.");
+			Response response = new Response(40002, "UserId not present in wallet.");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}
@@ -61,14 +61,14 @@ public class WalletController {
 			if (currentBalance >= amount) {
 				wallet.setAmount(currentBalance - amount);
 				Wallet updatedWallet = walletRepository.save(wallet);
-				Response response = new Response(2000, updatedWallet.getAmount(), "Amount debited successfully.");
+				Response response = new Response(20000, updatedWallet.getAmount(), "Amount debited successfully.");
 				return ResponseEntity.status(HttpStatus.OK).body(response);
 			} else {
-				Response response = new Response(4000, "Insufficient balance in wallet.");
+				Response response = new Response(40001, "Insufficient balance in wallet.");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 			}
 		} else {
-			Response response = new Response(4000, "UserId not present in wallet.");
+			Response response = new Response(40002, "UserId not present in wallet.");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}
