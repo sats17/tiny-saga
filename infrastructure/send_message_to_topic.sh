@@ -7,7 +7,7 @@ REPLICATION_FACTOR=1
 
 # Define the JSON event data
 JSON_DATA='
-{"eventId":"550e8400-e29b-41d4-a716-446655440000","correlationId":"8a2e2d59-9d36-4b87-8ae0-2a4eef15b7f6","eventName":"ORDER_INITIATED","version":"1.0","timestamp":214134323,"orderId":"12345","userId":"67890","orderStatus":"INITIATED","paymentType":"WALLET","productId":"123asf-sfa-2a","productQuantity":2,"price":1000}'
+{"eventId":"550e8400-e29b-41d4-a716-446655440000","correlationId":"8a2e2d59-9d36-4b87-8ae0-2a4eef15b7f6","eventName":"ORDER_INITIATED","version":"1.0","timestamp":214134323,"orderId":"12345","userId":"1","orderStatus":"INITIATED","paymentType":"WALLET","productId":"123asf-sfa-2a","productQuantity":2,"price":5000}
 
 # Enter into kafka docker cluster
 # Run kafka-console-producer command with one line json to send data
