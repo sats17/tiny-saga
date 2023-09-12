@@ -29,3 +29,4 @@ services:
 
 
 # More information about networking -> https://www.baeldung.com/kafka-docker-connection
+# docker exec -it <kafka-container-hash> bash
