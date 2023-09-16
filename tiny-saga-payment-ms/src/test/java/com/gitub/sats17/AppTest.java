@@ -1,23 +1,41 @@
-package com.gitub.sats17;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Configuration;
-
-import com.github.sats17.payment.controller.KafkaController;
-
-
-/**
- * Unit test for simple App.
- */
-public class AppTest {
-	
-	
-	public static void main(String[] args) throws InterruptedException {
-		KafkaController controller = new KafkaController();
-		controller.consume("{\"eventId\":\"550e8400-e29b-41d4-a716-446655440000\",\"correlationId\":\"8a2e2d59-9d36-4b87-8ae0-2a4eef15b7f6\",\"eventName\":\"ORDER_INITIATED\",\"version\":\"1.0\",\"timestamp\":214134323,\"orderId\":\"12345\",\"userId\":\"1\",\"orderStatus\":\"INITIATED\",\"paymentType\":\"WALLET\",\"productId\":\"123asf-sfa-2a\",\"productQuantity\":2,\"price\":5000}");
-
-	}
-	
-}
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.kafka.test.context.EmbeddedKafka;
+//import org.springframework.kafka.test.rule.EmbeddedKafkaRule;
+//import org.springframework.kafka.test.utils.ContainerTestUtils;
+//import org.springframework.test.annotation.DirtiesContext;
+//
+//@SpringBootTest
+//@EmbeddedKafka(topics = "order-topic", partitions = 1)
+//@DirtiesContext
+//public class AppTest {
+//
+//    @Autowired
+//    private KafkaEventConsumer kafkaEventConsumer;
+//
+//    @Autowired
+//    private EmbeddedKafkaRule embeddedKafka;
+//
+//    @Test
+//    public void testConsumeEvent() throws Exception {
+//        // Wait for embedded Kafka to be ready
+//        ContainerTestUtils.waitForAssignment(embeddedKafka.getEmbeddedKafka(), 1);
+//
+//        // Create a test message
+//        String message = "Test Message";
+//        // Produce the test message to the test topic
+//        // You can use a Kafka producer or a KafkaTemplate to do this
+//
+//        // Wait for the consumer to process the message (you might need to add some delays if necessary)
+//        Thread.sleep(1000);
+//
+//        // Add your assertions to verify the behavior of the consumer
+//        // For example:
+//        // assert ...
+//
+//        // Optionally, add assertions to verify that your method produced the expected result
+//        // For example:
+//        // assert ...
+//    }
+//}
