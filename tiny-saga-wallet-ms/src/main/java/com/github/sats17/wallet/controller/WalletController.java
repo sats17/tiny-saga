@@ -65,7 +65,7 @@ public class WalletController {
 				return ResponseEntity.status(HttpStatus.OK).body(response);
 			} else {
 				Response response = new Response(40001, "Insufficient balance in wallet.");
-				return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response);
 			}
 		} else {
 			Response response = new Response(40002, "UserId not present in wallet.");

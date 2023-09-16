@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sats17.payment.model.KafkaEventRequest;
 import com.github.sats17.payment.model.WalletMsResponse;
+import com.github.sats17.payment.util.AppUtils;
 
 @RestController
 @RequestMapping("/v1/api/payment")
@@ -83,39 +85,56 @@ public class KafkaController {
 		StringBuilder urlBuilder = new StringBuilder(baseUrl);
 		urlBuilder.append("?userId=").append(event.getUserId().trim());
 		urlBuilder.append("&amount=").append(event.getPrice());
-		System.out.println("Wallet ms URL = " + urlBuilder.toString());
+		AppUtils.printLog("Wallet ms URL = " + urlBuilder.toString());
 		URI uri = null;
 		try {
 			uri = new URI(urlBuilder.toString());
 		} catch (URISyntaxException e) {
+			AppUtils.printLog("Invalid Wallet MS URL");
 			e.printStackTrace();
 			return;
 		}
 
 		HttpEntity<String> requestEntity = new HttpEntity<>(null);
-		// Check how to handle errors
 		try {
 			ResponseEntity<WalletMsResponse> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, requestEntity,
 					WalletMsResponse.class);
 
 			if (responseEntity.getStatusCode().is2xxSuccessful()) {
-
-				if (responseEntity.getBody().getStatus() == 20000) {
-					System.out.println("Amount debited successfully.");
-				} else if (responseEntity.getBody().getStatus() == 40001) {
-					System.out.println(responseEntity.getBody().getResponseMessage());
-				} else {
-					System.out.println("Invoking event for payment failure");
+				WalletMsResponse response = responseEntity.getBody();
+				if(response == null) {
+					AppUtils.printLog("Null repsonse from wallet MS, response is not matching as per contract");
+				} else if (response.getStatus() == 20000) {
+					AppUtils.printLog("Amount debited successfully for userId "+event.getUserId());
+				}  else {
+					AppUtils.printLog("Invalid repsonse code from wallet MS, response is not matching as per contract. Repsonse -> "+response.toString());
 				}
 			} else {
-				System.out.println("Error: " + responseEntity.getStatusCode());
-				System.out.println("Invoking event for payment failure");
+				AppUtils.printLog("Http status code received from wallet ms is not as per contract, Status code "+responseEntity.getStatusCode());
 			}
-		} catch (HttpClientErrorException.BadRequest e) {
-			// Handle 400 Bad Request response
-			System.out.println("Client error");
+		} catch (HttpClientErrorException e) {
+			if(e.getStatusCode().equals(HttpStatusCode.valueOf(406))) {
+				WalletMsResponse response = e.getResponseBodyAs(WalletMsResponse.class);
+				if(response == null) {
+					AppUtils.printLog("Invalid repsonse from wallet MS");
+					e.printStackTrace();
+				} else if(response.getStatus() == 40001) {
+					AppUtils.printLog("Insufficient balance in wallet for user id "+event.getUserId().trim());
+				} else {
+					AppUtils.printLog("Something went wrong from wallet ms. Response -> "+ response.toString());
+				}
+			} else if(e.getStatusCode().equals(HttpStatusCode.valueOf(400))) {
+				WalletMsResponse response = e.getResponseBodyAs(WalletMsResponse.class);
+				if(response == null) {
+					AppUtils.printLog("Invalid repsonse from wallet MS");
+					e.printStackTrace();
+				} else if(response.getStatus() == 40002) {
+					AppUtils.printLog("User Id not present in wallet "+event.getUserId().trim());
+				} else {
+					AppUtils.printLog("Something went wrong from wallet ms. Response -> "+ response.toString());
+				}
+			}
 		} catch (Exception e) {
-			// Handle other exceptions
 			e.printStackTrace();
 		}
 	}
