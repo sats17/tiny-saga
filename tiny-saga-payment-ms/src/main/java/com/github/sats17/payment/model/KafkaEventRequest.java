@@ -12,7 +12,7 @@ public class KafkaEventRequest {
 	private String version;
 	private long timestamp;
 	private String orderId;
-	private String userId;
+	private Long userId;
 	private OrderStatus orderStatus;
 	private PaymentType paymentType;
 	private String productId;
@@ -79,11 +79,11 @@ public class KafkaEventRequest {
 		this.orderId = orderId;
 	}
 
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 
