@@ -17,6 +17,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.sats17.payment.config.Enums.PaymentStatus;
+import com.github.sats17.payment.config.Enums.PaymentType;
+import com.github.sats17.payment.entity.Transaction;
+import com.github.sats17.payment.entity.TransactionRepository;
 import com.github.sats17.payment.model.KafkaEventRequest;
 import com.github.sats17.payment.model.WalletMsResponse;
 import com.github.sats17.payment.util.AppUtils;
@@ -24,14 +28,9 @@ import com.github.sats17.payment.util.AppUtils;
 @RestController
 @RequestMapping("/v1/api/payment")
 public class KafkaController {
-
-	@Value(value = "${spring.kafka.group_id}")
-	private String groupId;
-
-	@GetMapping("/healthcheck")
-	public String getHealthCheck() {
-		return "ok ok health";
-	}
+	
+	@Autowired
+	TransactionRepository transactionRepository;
 
 	@Autowired
 	ObjectMapper mapper;
@@ -45,14 +44,24 @@ public class KafkaController {
 	@Value("${walletMs.basePath}")
 	private String walletMsBasePath;
 
+	@Value(value = "${spring.kafka.group_id}")
+	private String groupId;
+
+	@GetMapping("/healthcheck")
+	public String getHealthCheck() {
+		AppUtils.printLog("Data present in transaction DB "+transactionRepository.count());
+		return "ok ok health from transaction";
+	}
+
 	@KafkaListener(topics = { "order-topic" }, groupId = "${spring.kafka.group_id}")
 	public void consume(String event) throws InterruptedException {
 		KafkaEventRequest eventObj = null;
 		try {
 			eventObj = mapper.readValue(event, KafkaEventRequest.class);
-			System.out.println("Processing event");
 			switch (eventObj.getEventName()) {
 			case ORDER_INITIATED:
+				Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process", PaymentStatus.PAYMENT_INITIATED);
+				updateTransaction(transaction);
 				processOrderInitatedEvent(eventObj);
 				break;
 			case INVENTORY_INSUFFICIENT:
@@ -72,14 +81,14 @@ public class KafkaController {
 
 	private void processOrderInitatedEvent(KafkaEventRequest event) {
 		System.out.println("Processing order intiated event");
-		performGetRequest(event);
+		callWalletMSToDebitAmount(event);
 	}
 
 	private void processInventoryInsufficientEvent(KafkaEventRequest event) {
 		System.out.println("Processing inventory insufficient event");
 	}
 
-	public void performGetRequest(KafkaEventRequest event) {
+	public void callWalletMSToDebitAmount(KafkaEventRequest event) {
 		String baseUrl = walletMsHost + walletMsBasePath + "/debit";
 
 		StringBuilder urlBuilder = new StringBuilder(baseUrl);
@@ -139,4 +148,21 @@ public class KafkaController {
 		}
 	}
 
+	private Transaction buildTransaction(KafkaEventRequest event, String description, PaymentStatus paymentStatus) {
+		Transaction transaction = new Transaction();
+		transaction.setOrderId(event.getOrderId());
+		transaction.setAmount(event.getPrice());
+		transaction.setDescription(description);
+		transaction.setUserId(event.getUserId());
+		transaction.setTimestamp(AppUtils.generateEpochTimestamp());
+		transaction.setCurrency("INR");
+		transaction.setTransactionId(AppUtils.generateUniqueID());
+		transaction.setPaymentStatus(paymentStatus);
+		
+		return transaction;
+	}
+	
+	private void updateTransaction(Transaction transaction) {
+		transactionRepository.save(transaction);
+	}
 }
