@@ -27,7 +27,7 @@ public class WalletServiceApplication {
         Random rand = new Random();
         for (int i = 1; i <= 5; i++) {
             Wallet wallet = new Wallet();
-            wallet.setUserId((long) i);
+            wallet.setUserId(String.valueOf(i));
             wallet.setAmount((double) rand.nextInt(1000));
             Wallet output = walletRepository.save(wallet);
             System.out.println("Inserted wallet record with ID: " + output.getUserId() + " and amount: " + output.getAmount());
