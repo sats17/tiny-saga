@@ -108,10 +108,19 @@ public class KafkaController {
 					AppUtils.printLog("Null repsonse from wallet MS, response is not matching as per contract");
 				} else if (response.getStatus() == 20000) {
 					AppUtils.printLog("Amount debited successfully for userId "+event.getUserId());
+					Transaction transaction = buildTransaction(event, "Amount debit is done", PaymentStatus.PAYMENT_DONE, 
+							TransactionType.WITHDRAWAL);
+					updateTransaction(transaction);
 				}  else {
+					Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+							TransactionType.WITHDRAWAL);
+					updateTransaction(transaction);
 					AppUtils.printLog("Invalid repsonse code from wallet MS, response is not matching as per contract. Repsonse -> "+response.toString());
 				}
 			} else {
+				Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+						TransactionType.WITHDRAWAL);
+				updateTransaction(transaction);
 				AppUtils.printLog("Http status code received from wallet ms is not as per contract, Status code "+responseEntity.getStatusCode());
 			}
 		} catch (HttpClientErrorException e) {
@@ -136,8 +145,14 @@ public class KafkaController {
 					AppUtils.printLog("Something went wrong from wallet ms. Response -> "+ response.toString());
 				}
 			}
+			Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+					TransactionType.WITHDRAWAL);
+			updateTransaction(transaction);
 		} catch (Exception e) {
 			e.printStackTrace();
+			Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+					TransactionType.WITHDRAWAL);
+			updateTransaction(transaction);
 		}
 	}
 
