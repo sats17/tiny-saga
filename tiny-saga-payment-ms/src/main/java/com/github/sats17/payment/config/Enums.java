@@ -29,7 +29,7 @@ public class Enums {
 	}
 	
 	public enum TransactionType {
-		DEPOSIT, WITHDRAWAL, PAYMENT
+		DEPOSIT, WITHDRAWAL
 	}
 	
 	public enum PaymentStatus {

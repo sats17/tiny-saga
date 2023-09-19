@@ -10,23 +10,20 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sats17.payment.config.Enums.PaymentStatus;
-import com.github.sats17.payment.config.Enums.PaymentType;
+import com.github.sats17.payment.config.Enums.TransactionType;
 import com.github.sats17.payment.entity.Transaction;
 import com.github.sats17.payment.entity.TransactionRepository;
 import com.github.sats17.payment.model.KafkaEventRequest;
 import com.github.sats17.payment.model.WalletMsResponse;
 import com.github.sats17.payment.util.AppUtils;
 
-@RestController
-@RequestMapping("/v1/api/payment")
+@Component
 public class KafkaController {
 	
 	@Autowired
@@ -47,11 +44,6 @@ public class KafkaController {
 	@Value(value = "${spring.kafka.group_id}")
 	private String groupId;
 
-	@GetMapping("/healthcheck")
-	public String getHealthCheck() {
-		AppUtils.printLog("Data present in transaction DB "+transactionRepository.count());
-		return "ok ok health from transaction";
-	}
 
 	@KafkaListener(topics = { "order-topic" }, groupId = "${spring.kafka.group_id}")
 	public void consume(String event) throws InterruptedException {
@@ -60,7 +52,8 @@ public class KafkaController {
 			eventObj = mapper.readValue(event, KafkaEventRequest.class);
 			switch (eventObj.getEventName()) {
 			case ORDER_INITIATED:
-				Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process", PaymentStatus.PAYMENT_INITIATED);
+				Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process", PaymentStatus.PAYMENT_INITIATED, 
+						TransactionType.WITHDRAWAL);
 				updateTransaction(transaction);
 				processOrderInitatedEvent(eventObj);
 				break;
@@ -148,7 +141,8 @@ public class KafkaController {
 		}
 	}
 
-	private Transaction buildTransaction(KafkaEventRequest event, String description, PaymentStatus paymentStatus) {
+	private Transaction buildTransaction(KafkaEventRequest event, String description, PaymentStatus paymentStatus, 
+			TransactionType transactionType) {
 		Transaction transaction = new Transaction();
 		transaction.setOrderId(event.getOrderId());
 		transaction.setAmount(event.getPrice());
@@ -158,6 +152,7 @@ public class KafkaController {
 		transaction.setCurrency("INR");
 		transaction.setTransactionId(AppUtils.generateUniqueID());
 		transaction.setPaymentStatus(paymentStatus);
+		transaction.setTransactionType(transactionType);
 		
 		return transaction;
 	}
