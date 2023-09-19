@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -34,6 +35,9 @@ public class KafkaController {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
 	@Value("${walletMs.host}")
 	private String walletMsHost;
@@ -108,10 +112,19 @@ public class KafkaController {
 					AppUtils.printLog("Null repsonse from wallet MS, response is not matching as per contract");
 				} else if (response.getStatus() == 20000) {
 					AppUtils.printLog("Amount debited successfully for userId "+event.getUserId());
+					Transaction transaction = buildTransaction(event, "Amount debit is done", PaymentStatus.PAYMENT_DONE, 
+							TransactionType.WITHDRAWAL);
+					updateTransaction(transaction);
 				}  else {
+					Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+							TransactionType.WITHDRAWAL);
+					updateTransaction(transaction);
 					AppUtils.printLog("Invalid repsonse code from wallet MS, response is not matching as per contract. Repsonse -> "+response.toString());
 				}
 			} else {
+				Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+						TransactionType.WITHDRAWAL);
+				updateTransaction(transaction);
 				AppUtils.printLog("Http status code received from wallet ms is not as per contract, Status code "+responseEntity.getStatusCode());
 			}
 		} catch (HttpClientErrorException e) {
@@ -136,8 +149,14 @@ public class KafkaController {
 					AppUtils.printLog("Something went wrong from wallet ms. Response -> "+ response.toString());
 				}
 			}
+			Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+					TransactionType.WITHDRAWAL);
+			updateTransaction(transaction);
 		} catch (Exception e) {
 			e.printStackTrace();
+			Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+					TransactionType.WITHDRAWAL);
+			updateTransaction(transaction);
 		}
 	}
 
@@ -159,5 +178,9 @@ public class KafkaController {
 	
 	private void updateTransaction(Transaction transaction) {
 		transactionRepository.save(transaction);
+	}
+	
+	private void publishMessageToTopic(String topicName, String message) {
+		//TODO: Add logic here to push message to topic.
 	}
 }
