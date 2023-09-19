@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -34,6 +35,9 @@ public class KafkaController {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
 
 	@Value("${walletMs.host}")
 	private String walletMsHost;
@@ -174,5 +178,9 @@ public class KafkaController {
 	
 	private void updateTransaction(Transaction transaction) {
 		transactionRepository.save(transaction);
+	}
+	
+	private void publishMessageToTopic(String topicName, String message) {
+		//TODO: Add logic here to push message to topic.
 	}
 }
