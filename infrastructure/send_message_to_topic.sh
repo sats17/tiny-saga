@@ -11,7 +11,7 @@ JSON_DATA='
 
 # Enter into kafka docker cluster
 # Run kafka-console-producer command with one line json to send data
-# kafka-console-producer
+# kafka-console-producer --bootstrap-server kafka:9092 --topic order-topic
 
 # Send the JSON event to Kafka
 echo "$JSON_DATA" | docker run --rm -i \

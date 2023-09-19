@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.sats17.wallet.entity.Response;
 import com.github.sats17.wallet.entity.Wallet;
 import com.github.sats17.wallet.entity.WalletRepository;
+import com.github.sats17.wallet.utils.AppUtils;
 
 
 // http://localhost:8086/swagger-ui/index.html#/
@@ -25,7 +26,7 @@ public class WalletController {
 	private WalletRepository walletRepository;
 
 	@GetMapping("/amount")
-	public ResponseEntity<Response> getAmount(@RequestParam Long userId) {
+	public ResponseEntity<Response> getAmount(@RequestParam String userId) {
 		Optional<Wallet> walletOptional = walletRepository.findById(userId);
 		if (walletOptional.isPresent()) {
 			Wallet wallet = walletOptional.get();
@@ -38,7 +39,7 @@ public class WalletController {
 	}
 
 	@PostMapping("/amount")
-	public ResponseEntity<Response> postAmount(@RequestParam Long userId, @RequestParam Double amount) {
+	public ResponseEntity<Response> postAmount(@RequestParam String userId, @RequestParam Double amount) {
 		Optional<Wallet> walletOptional = walletRepository.findById(userId);
 		if (walletOptional.isPresent()) {
 			Wallet wallet = walletOptional.get();
@@ -53,7 +54,8 @@ public class WalletController {
 	}
 
 	@PostMapping("/debit")
-	public ResponseEntity<Response> debitAmount(@RequestParam Long userId, @RequestParam Double amount) {
+	public ResponseEntity<Response> debitAmount(@RequestParam String userId, @RequestParam Double amount) {
+		AppUtils.printLog("Request received for user "+userId+" to debit amount "+amount);
 		Optional<Wallet> walletOptional = walletRepository.findById(userId);
 		if (walletOptional.isPresent()) {
 			Wallet wallet = walletOptional.get();
