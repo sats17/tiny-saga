@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.github.sats17.payment.config.Enums.EventName;
 import com.github.sats17.payment.config.Enums.OrderStatus;
+import com.github.sats17.payment.config.Enums.PaymentStatus;
 import com.github.sats17.payment.config.Enums.PaymentType;
 
 @JsonInclude(Include.NON_NULL)
@@ -17,6 +18,7 @@ public class KafkaEventRequest {
 	private String orderId;
 	private String userId;
 	private OrderStatus orderStatus;
+	private PaymentStatus paymentStatus;
 	private PaymentType paymentType;
 	private String productId;
 	private int productQuantity;
@@ -117,5 +119,23 @@ public class KafkaEventRequest {
 	public void setPaymentType(PaymentType paymentType) {
 		this.paymentType = paymentType;
 	}
+
+	public PaymentStatus getPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(PaymentStatus paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
+
+	@Override
+	public String toString() {
+		return "KafkaEventRequest [eventId=" + eventId + ", correlationId=" + correlationId + ", eventName=" + eventName
+				+ ", version=" + version + ", timestamp=" + timestamp + ", orderId=" + orderId + ", userId=" + userId
+				+ ", orderStatus=" + orderStatus + ", paymentStatus=" + paymentStatus + ", paymentType=" + paymentType
+				+ ", productId=" + productId + ", productQuantity=" + productQuantity + ", price=" + price + "]";
+	}
+	
+	
 
 }

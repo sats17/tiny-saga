@@ -16,6 +16,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.sats17.payment.config.Enums.EventName;
+import com.github.sats17.payment.config.Enums.OrderStatus;
 import com.github.sats17.payment.config.Enums.PaymentStatus;
 import com.github.sats17.payment.config.Enums.TransactionType;
 import com.github.sats17.payment.entity.Transaction;
@@ -65,7 +67,7 @@ public class KafkaController {
 				processInventoryInsufficientEvent(eventObj);
 				break;
 			default:
-				System.out.println("Invalid event received");
+				AppUtils.printLog("Unknown event recevied");
 				break;
 			}
 		} catch (Exception e) {
@@ -115,6 +117,7 @@ public class KafkaController {
 					Transaction transaction = buildTransaction(event, "Amount debit is done", PaymentStatus.PAYMENT_DONE, 
 							TransactionType.WITHDRAWAL);
 					updateTransaction(transaction);
+					sendPaymentDoneEvent(event);
 				}  else {
 					Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
 							TransactionType.WITHDRAWAL);
@@ -181,6 +184,24 @@ public class KafkaController {
 	}
 	
 	private void publishMessageToTopic(String topicName, String message) {
-		//TODO: Add logic here to push message to topic.
+		kafkaTemplate.send(topicName, message);
+	}
+	
+	private void sendPaymentDoneEvent(KafkaEventRequest request) {
+		KafkaEventRequest pushRequest = new KafkaEventRequest();
+		pushRequest.setEventId(AppUtils.generateUniqueID());
+		pushRequest.setCorrelationId(request.getCorrelationId());
+		pushRequest.setEventName(EventName.PAYMENT_DONE);
+		pushRequest.setVersion("1.0");
+		pushRequest.setTimestamp(AppUtils.generateEpochTimestamp());
+		pushRequest.setOrderId(request.getOrderId());
+		pushRequest.setUserId(request.getUserId());
+		pushRequest.setOrderStatus(OrderStatus.INITIATED);
+		pushRequest.setPaymentStatus(PaymentStatus.PAYMENT_DONE);
+		pushRequest.setProductId(request.getProductId());
+		pushRequest.setProductQuantity(request.getProductQuantity());
+		System.out.println(pushRequest.toString());
+		String data = AppUtils.convertObjectToJsonString(pushRequest);
+		publishMessageToTopic("order-topic", data);
 	}
 }
