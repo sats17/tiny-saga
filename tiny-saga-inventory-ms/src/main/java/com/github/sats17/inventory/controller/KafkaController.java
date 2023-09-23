@@ -60,15 +60,14 @@ public class KafkaController {
 		System.out.println("Quantity "+eventObj.getProductQuantity());
 		System.out.println("Id "+eventObj.getProductId());
 		Optional<Inventory> inventory = inventoryRepository.findById(productId);
-		System.out.println("Before inventory "+inventory.get().toString());
 		if (inventory.isEmpty()) {
-			AppUtils.printLog("No data found in inventory, Check with administrator");
+			AppUtils.printLog("No product found in inventory, Check with administrator");
 			return false;
 		} else {
 			int rowsAffected = inventoryRepository.updateProductQuantity(productId, eventObj.getProductQuantity());
 			if (rowsAffected == 0) {
 				AppUtils.printLog(
-						"Inventory not sufficient. Available inventory is " + inventory.get().getProductQuantity());
+						"Quantity is not sufficient. Available quantity is " + inventory.get().getProductQuantity());
 				return false;
 			}
 			System.out.println("Rows affected "+rowsAffected);

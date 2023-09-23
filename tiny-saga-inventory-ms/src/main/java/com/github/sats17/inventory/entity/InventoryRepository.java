@@ -14,7 +14,7 @@ public interface InventoryRepository extends CrudRepository<Inventory, String> {
 	@Modifying(flushAutomatically = true)
 	 @Query("UPDATE Inventory p SET p.productQuantity = CASE " +
 	            "WHEN p.productQuantity >= :newQuantity THEN p.productQuantity - :newQuantity " +
-	            "ELSE p.productQuantity END " +
+	            "END " +
 	            "WHERE p.productId = :productId")    
 	int updateProductQuantity(@Param("productId") String productId, @Param("newQuantity") int quantity);
 }

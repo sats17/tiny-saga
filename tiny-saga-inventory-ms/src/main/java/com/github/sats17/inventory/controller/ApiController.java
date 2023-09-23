@@ -26,8 +26,8 @@ public class ApiController {
 	@GetMapping("/test")
 	public void test() {
 		KafkaEventRequest eventRequest = new KafkaEventRequest();
-		eventRequest.setProductId("2");
-		eventRequest.setProductQuantity(1);
+		eventRequest.setProductId("12");
+		eventRequest.setProductQuantity(23);
 		kafkaController.isInventoryAvailable(eventRequest);
 		System.out.println(repository.findById("2").get().toString());
 	}
