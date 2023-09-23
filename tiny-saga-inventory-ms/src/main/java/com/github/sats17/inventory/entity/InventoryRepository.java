@@ -5,12 +5,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface InventoryRepository extends CrudRepository<Inventory, String> {
 	
-	@Modifying
-    @Query("UPDATE Inventory p SET p.productQuantity = CASE WHEN p.productQuantity >= :newQuantity THEN :newQuantity ELSE p.productQuantity END WHERE p.productId = :productId")
-    int updateProductQuantity(@Param("productId") String productId, @Param("newQuantity") int quantity);
+	@Transactional
+	@Modifying(flushAutomatically = true)
+	 @Query("UPDATE Inventory p SET p.productQuantity = CASE " +
+	            "WHEN p.productQuantity >= :newQuantity THEN p.productQuantity - :newQuantity " +
+	            "ELSE p.productQuantity END " +
+	            "WHERE p.productId = :productId")    
+	int updateProductQuantity(@Param("productId") String productId, @Param("newQuantity") int quantity);
 }
 

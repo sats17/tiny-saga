@@ -33,4 +33,9 @@ public class Inventory {
 		this.productQuantity = productQuantity;
 	}
 
+	@Override
+	public String toString() {
+		return "Inventory [productId=" + productId + ", productQuantity=" + productQuantity + "]";
+	}
+
 }

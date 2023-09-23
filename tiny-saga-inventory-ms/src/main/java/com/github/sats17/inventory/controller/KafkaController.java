@@ -55,9 +55,12 @@ public class KafkaController {
 		}
 	}
 
-	private boolean isInventoryAvailable(KafkaEventRequest eventObj) {
+	public boolean isInventoryAvailable(KafkaEventRequest eventObj) {
 		String productId = eventObj.getProductId();
+		System.out.println("Quantity "+eventObj.getProductQuantity());
+		System.out.println("Id "+eventObj.getProductId());
 		Optional<Inventory> inventory = inventoryRepository.findById(productId);
+		System.out.println("Before inventory "+inventory.get().toString());
 		if (inventory.isEmpty()) {
 			AppUtils.printLog("No data found in inventory, Check with administrator");
 			return false;
@@ -68,6 +71,7 @@ public class KafkaController {
 						"Inventory not sufficient. Available inventory is " + inventory.get().getProductQuantity());
 				return false;
 			}
+			System.out.println("Rows affected "+rowsAffected);
 			return true;
 		}
 	}
