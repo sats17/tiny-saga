@@ -1,0 +1,11 @@
+server:
+  port: 8088
+  
+springdoc.api-docs.path: /inventory-docs
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092
+    group_id: inventory-ms
+
+  
