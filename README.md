@@ -221,10 +221,10 @@ Payment page~~
 * Listen by = Order MS, Payment MS
 
 ## Kafka design
-* Single topic
-* Partitions ?
-* Consumer Groups for each microservice, so multiple instance of microservice can receive only once message.
-* Application needs to ignore message if they are not consumer of that message, and those eventTypes or eventName will be configurable outside code.
+* Single topic -> Yes order-topic. Each microservice will ignore the event that they don't want.
+* Partitions ? -> Not yet decided.
+* Consumer Groups for each microservice, so multiple instances/replicas of microservice can receive only one message.
+* Application needs to ignore the message if they are not consumers of that message, and those eventTypes or eventName will be configurable outside code.
 
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS?
@@ -234,4 +234,5 @@ Payment page~~
 * How you will handle system failure between payment ms and wallet ms ? -> We will use retry with exponential backoff logic, once limit of retry reached then we will send error to client. And we will mark order as fail.
 * If inventory ms do not have item left -> Early fail will be bettter. Order MS will check in inventory ms if any stock available or not. (This is one option, also from user experience there will be a API call will trigger, before user click on place order. Which will tell stock is available or not.)
 * Why we discarded approach of separte flow of order placed and payment ? -> To avoid incosistency of payment faliure, and get early failback. When user click on place order with payment mode frontend send request to order ms with payment type(wallet, upi). Using this we can avoid incosistency.
+* How inventory can be consistent in multiple replicas of inventory MS ?
 
