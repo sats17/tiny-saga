@@ -5,13 +5,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
+@EnableTransactionManagement
 @Repository
 public interface InventoryRepository extends CrudRepository<Inventory, String> {
 	
 	@Transactional
-	@Modifying(flushAutomatically = true)
+	@Modifying(flushAutomatically = true, clearAutomatically = true) // Flush(Before) and Clears(After) settings, clears JPA cache.
 //	 @Query("UPDATE Inventory p SET p.productQuantity = CASE " +
 //	            "WHEN p.productQuantity >= :newQuantity THEN p.productQuantity - :newQuantity " +
 //	            "ELSE p.productQuantity END " +

@@ -56,6 +56,7 @@ public class KafkaController {
 		KafkaEventRequest eventObj = null;
 		try {
 			eventObj = mapper.readValue(event, KafkaEventRequest.class);
+			AppUtils.printLog("Event recevied = "+eventObj.getEventName());
 			switch (eventObj.getEventName()) {
 			case ORDER_INITIATED:
 				Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process", PaymentStatus.PAYMENT_INITIATED, 
@@ -67,7 +68,7 @@ public class KafkaController {
 				processInventoryInsufficientEvent(eventObj);
 				break;
 			default:
-				AppUtils.printLog("Unknown event recevied");
+				AppUtils.printLog("Event not supported");
 				break;
 			}
 		} catch (Exception e) {
