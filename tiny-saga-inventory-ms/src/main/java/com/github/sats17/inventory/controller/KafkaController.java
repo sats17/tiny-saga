@@ -65,9 +65,10 @@ public class KafkaController {
 			return false;
 		} else {
 			int rowsAffected = inventoryRepository.updateProductQuantity(productId, eventObj.getProductQuantity());
-			if (rowsAffected == 0) {
+			System.out.println(rowsAffected);
+			if (rowsAffected <= 0) {
 				AppUtils.printLog(
-						"Quantity is not sufficient. Available quantity is " + inventory.get().getProductQuantity());
+						"Quantity is not sufficient for product "+ inventory.get().getProductId()+". Available quantity is " + inventory.get().getProductQuantity());
 				return false;
 			}
 			System.out.println("Rows affected "+rowsAffected);

@@ -12,10 +12,13 @@ public interface InventoryRepository extends CrudRepository<Inventory, String> {
 	
 	@Transactional
 	@Modifying(flushAutomatically = true)
-	 @Query("UPDATE Inventory p SET p.productQuantity = CASE " +
-	            "WHEN p.productQuantity >= :newQuantity THEN p.productQuantity - :newQuantity " +
-	            "END " +
-	            "WHERE p.productId = :productId")    
+//	 @Query("UPDATE Inventory p SET p.productQuantity = CASE " +
+//	            "WHEN p.productQuantity >= :newQuantity THEN p.productQuantity - :newQuantity " +
+//	            "ELSE p.productQuantity END " +
+//	            "WHERE p.productId = :productId")  
+	@Query("UPDATE Inventory p SET p.productQuantity = p.productQuantity - :newQuantity "
+			+ "where p.productQuantity >= :newQuantity AND "
+			+ "p.productId = :productId")
 	int updateProductQuantity(@Param("productId") String productId, @Param("newQuantity") int quantity);
 }
 

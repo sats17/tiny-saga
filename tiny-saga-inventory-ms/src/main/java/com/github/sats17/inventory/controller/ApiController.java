@@ -6,6 +6,7 @@ import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.sats17.inventory.entity.Inventory;
@@ -23,16 +24,16 @@ public class ApiController {
 	@Autowired
 	InventoryRepository repository;
 	
-	@GetMapping("/test")
-	public void test() {
+	@GetMapping("/products/consume")
+	public List<Inventory> consumeProduct(@RequestParam String productId, @RequestParam int productQuantity) {
 		KafkaEventRequest eventRequest = new KafkaEventRequest();
-		eventRequest.setProductId("12");
-		eventRequest.setProductQuantity(23);
+		eventRequest.setProductId(productId);
+		eventRequest.setProductQuantity(productQuantity);
 		kafkaController.isInventoryAvailable(eventRequest);
-		System.out.println(repository.findById("2").get().toString());
+		return getAllProducts();
 	}
 	
-	@GetMapping("/inventory")
+	@GetMapping("/products")
 	public List<Inventory> getAllProducts() {
 		AppUtils.printLog("Data present in transaction DB " + repository.count());
 		Iterable<Inventory> transactionIterable = repository.findAll();
