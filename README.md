@@ -3,6 +3,10 @@ Proof of concept implementation of microservices saga pattern.
 
 ## Draft Version 1.0.0
 
+## Technical Diagrams
+![Create Order With Success Flow](https://github.com/sats17/tiny-saga/blob/diagrams/Success_Order_Flow-Success-Order.drawio.png)
+
+
 Components
 ### API Gateway
 The API gateway acts as a single entry point for client requests, providing load balancing, authentication, and rate limiting.
