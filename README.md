@@ -4,7 +4,7 @@ Proof of concept implementation of microservices saga pattern.
 ## Draft Version 1.0.0
 
 ## Technical Diagrams
-![Create Order With Success Flow](https://github.com/sats17/tiny-saga/blob/main/diagrams/Success_Order_Flow-Success-Order.drawio.png)
+### https://sats17.github.io/tiny-saga/
 
 
 Components
