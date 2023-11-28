@@ -40,10 +40,10 @@ public class KafkaController {
 			AppUtils.printLog("Event recevied = "+eventObj.getEventName());
 			switch (eventObj.getEventName()) {
 			case ORDER_INITIATED:
-				AppUtils.printLog("Event not supported");
+				AppUtils.printLog("ORDER_INITIATED Event not supported");
 				break;
 			case INVENTORY_INSUFFICIENT:
-				AppUtils.printLog("Event not supported");
+				AppUtils.printLog("INVENTORY_INSUFFICIENT Event not supported");
 				break;
 			case PAYMENT_DONE:
 				boolean status = updateInventory(eventObj);

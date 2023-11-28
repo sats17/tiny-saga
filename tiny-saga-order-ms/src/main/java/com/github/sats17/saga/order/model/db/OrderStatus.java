@@ -2,6 +2,7 @@ package com.github.sats17.saga.order.model.db;
 
 import com.github.sats17.saga.order.enums.Status;
 
+@Deprecated
 public class OrderStatus {
 
 	private Status status;

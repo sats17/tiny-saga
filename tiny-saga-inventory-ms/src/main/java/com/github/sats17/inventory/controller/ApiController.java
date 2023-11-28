@@ -24,14 +24,14 @@ public class ApiController {
 	@Autowired
 	InventoryRepository repository;
 	
-	@GetMapping("/products/consume")
-	public List<Inventory> consumeProduct(@RequestParam String productId, @RequestParam int productQuantity) {
-		KafkaEventRequest eventRequest = new KafkaEventRequest();
-		eventRequest.setProductId(productId);
-		eventRequest.setProductQuantity(productQuantity);
-		kafkaController.isInventoryAvailable(eventRequest);
-		return getAllProducts();
-	}
+//	@GetMapping("/products/consume")
+//	public List<Inventory> consumeProduct(@RequestParam String productId, @RequestParam int productQuantity) {
+//		KafkaEventRequest eventRequest = new KafkaEventRequest();
+//		eventRequest.setProductId(productId);
+//		eventRequest.setProductQuantity(productQuantity);
+//		kafkaController.isInventoryAvailable(eventRequest);
+//		return getAllProducts();
+//	}
 	
 	@GetMapping("/products")
 	public List<Inventory> getAllProducts() {

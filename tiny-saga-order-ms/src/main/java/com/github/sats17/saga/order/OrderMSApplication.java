@@ -22,16 +22,16 @@ public class OrderMSApplication {
     	ConfigurableApplicationContext test  = SpringApplication.run(OrderMSApplication.class, args);
     }
     
-    @Bean
-    public void ingestTempData() {
-    	Order order1 = new Order();
-    	order1.setOrderId(11111L);
-    	order1.setProductId(12312L);
-    	orderRepository.save(order1);
-    	orderRepository.findAll().forEach(test -> {
-    		System.out.println(test);
-    	});
-    }
+//    @Bean
+//    public void ingestTempData() {
+//    	Order order1 = new Order();
+//    	order1.setOrderId(11111L);
+//    	order1.setProductId(12312L);
+//    	orderRepository.save(order1);
+//    	orderRepository.findAll().forEach(test -> {
+//    		System.out.println(test);
+//    	});
+//    }
     
     
 }

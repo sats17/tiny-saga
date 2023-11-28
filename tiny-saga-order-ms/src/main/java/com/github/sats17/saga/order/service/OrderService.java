@@ -3,7 +3,9 @@ package com.github.sats17.saga.order.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +22,10 @@ public class OrderService {
 	OrderRepository orderRepository;
 	
 	@Autowired
-	KafkaProducerService kafkaProducerService;
+	private KafkaTemplate<String, String> kafkaTemplate;
+
+	@Value(value = "${spring.kafka.group_id}")
+	private String groupId;
 	
 //	@Autowired
 //	RawKafkaService rawKafkaService;
@@ -32,20 +37,19 @@ public class OrderService {
 		order.setOrderId(orderId);
 		order.setProductId(productId);
 		order.setUserId(userId);
-		OrderStatus orderStatus = new OrderStatus();
-		orderStatus.setIsInventoryUpdated(false);
-		orderStatus.setIsPaymentDone(false);
-		orderStatus.setStatus(Status.Initialized);
-		order.setOrderStatus(orderStatus);
+		order.setOrderStatus(Status.Initialized);
 		Order responseOrder = orderRepository.save(order);
 		if(responseOrder.getOrderId() != null) {
-			//rawKafkaService.publish(writer.writeValueAsString(responseOrder));
-			kafkaProducerService.publish("hahahah", writer.writeValueAsString(responseOrder));
+			publishMessageToTopic(groupId,  writer.writeValueAsString(responseOrder));
 			return responseOrder;
 		} else {
 			throw new Exception("Order creation failed");
 		}
 		
+	}
+	
+	private void publishMessageToTopic(String topicName, String message) {
+		kafkaTemplate.send(topicName, message);
 	}
 
 	public Order getOrder(Long orderId) throws Exception {
