@@ -9,7 +9,7 @@
 		<artifactId>tiny-saga</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-
+	
 	<groupId>com.gitub.sats17</groupId>
 	<artifactId>tiny-saga-inventory-ms</artifactId>
 	<version>1.0-SNAPSHOT</version>
@@ -49,7 +49,8 @@
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
 		</dependency>
-
+		<!--Since spring boot removed bootstrap properties, we need to add bootstrap dependency externally 
+		to support. -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-bootstrap</artifactId>

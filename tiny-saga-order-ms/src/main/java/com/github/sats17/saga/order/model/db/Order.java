@@ -1,25 +1,44 @@
 package com.github.sats17.saga.order.model.db;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.github.sats17.saga.order.configuration.Enums;
+import com.github.sats17.saga.order.enums.Status;
 
-@Document
-public class Order {
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "orders")
+public class Order  {
 
 	@Id
-	private Long orderId;
+	private String orderId;
 
 	private String userId;
 
-	private OrderStatus orderStatus;
+	private Enums.OrderStatus status;
 
-	private Long productId;
+	private String productId;
 
-	public Long getOrderId() {
+	private Long quantity;
+	private Long price;
+	private Long createdAt;
+	private Long updateAt;
+	private String statusInfo;
+
+	public String getStatusInfo() {
+		return statusInfo;
+	}
+
+	public void setStatusInfo(String statusInfo) {
+		this.statusInfo = statusInfo;
+	}
+
+	public String getOrderId() {
 		return orderId;
 	}
 
-	public void setOrderId(Long orderId) {
+	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
 
@@ -31,69 +50,54 @@ public class Order {
 		this.userId = userId;
 	}
 
-	public OrderStatus getOrderStatus() {
-		return orderStatus;
+	public Long getQuantity() {
+		return quantity;
 	}
 
-	public void setOrderStatus(OrderStatus orderStatus) {
-		this.orderStatus = orderStatus;
+	public void setQuantity(Long quantity) {
+		this.quantity = quantity;
 	}
 
-	public Long getProductId() {
+	public Long getPrice() {
+		return price;
+	}
+
+	public void setPrice(Long price) {
+		this.price = price;
+	}
+
+	public Long getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Long createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public Long getUpdateAt() {
+		return updateAt;
+	}
+
+	public void setUpdateAt(Long updateAt) {
+		this.updateAt = updateAt;
+	}
+
+	public String getProductId() {
 		return productId;
 	}
 
-	public void setProductId(Long productId) {
+	public void setProductId(String productId) {
 		this.productId = productId;
 	}
 
-	@Override
-	public String toString() {
-		return "Order [orderId=" + orderId + ", userId=" + userId + ", orderStatus=" + orderStatus + ", productId="
-				+ productId + "]";
+	public Enums.OrderStatus getStatus() {
+		return status;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((orderId == null) ? 0 : orderId.hashCode());
-		result = prime * result + ((orderStatus == null) ? 0 : orderStatus.hashCode());
-		result = prime * result + ((productId == null) ? 0 : productId.hashCode());
-		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
-		return result;
+	public void setStatus(Enums.OrderStatus status) {
+		this.status = status;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Order other = (Order) obj;
-		if (orderId == null) {
-			if (other.orderId != null)
-				return false;
-		} else if (!orderId.equals(other.orderId))
-			return false;
-		if (orderStatus == null) {
-			if (other.orderStatus != null)
-				return false;
-		} else if (!orderStatus.equals(other.orderStatus))
-			return false;
-		if (productId == null) {
-			if (other.productId != null)
-				return false;
-		} else if (!productId.equals(other.productId))
-			return false;
-		if (userId == null) {
-			if (other.userId != null)
-				return false;
-		} else if (!userId.equals(other.userId))
-			return false;
-		return true;
-	}
+
 
 }

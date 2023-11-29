@@ -3,7 +3,7 @@ package com.github.sats17.saga.order.model.request;
 public class CreateOrderSchema {
 
 	private String userId;
-	private Long productId;
+	private String productId;
 
 	public String getUserId() {
 		return userId;
@@ -13,11 +13,11 @@ public class CreateOrderSchema {
 		this.userId = userId;
 	}
 
-	public Long getProductId() {
+	public String getProductId() {
 		return productId;
 	}
 
-	public void setProductId(Long productId) {
+	public void setProductId(String productId) {
 		this.productId = productId;
 	}
 

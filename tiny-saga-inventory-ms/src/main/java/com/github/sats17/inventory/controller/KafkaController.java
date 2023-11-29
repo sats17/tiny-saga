@@ -40,10 +40,10 @@ public class KafkaController {
 			AppUtils.printLog("Event recevied = "+eventObj.getEventName());
 			switch (eventObj.getEventName()) {
 			case ORDER_INITIATED:
-				AppUtils.printLog("Event not supported");
+				AppUtils.printLog("ORDER_INITIATED Event not supported");
 				break;
 			case INVENTORY_INSUFFICIENT:
-				AppUtils.printLog("Event not supported");
+				AppUtils.printLog("INVENTORY_INSUFFICIENT Event not supported");
 				break;
 			case PAYMENT_DONE:
 				boolean status = updateInventory(eventObj);
@@ -68,7 +68,7 @@ public class KafkaController {
 		String productId = eventObj.getProductId();
 		Optional<Inventory> inventory = inventoryRepository.findById(productId);
 		if (inventory.isEmpty()) {
-			AppUtils.printLog("No product found in inventory, Check with administrator");
+			AppUtils.printLog("No product found in inventory, Check with administrator. ProductId: "+productId);
 			return false;
 		} else {
 			int rowsAffected = inventoryRepository.updateProductQuantity(productId, eventObj.getProductQuantity());
