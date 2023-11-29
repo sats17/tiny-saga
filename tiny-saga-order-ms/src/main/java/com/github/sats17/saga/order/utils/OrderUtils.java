@@ -1,12 +1,27 @@
 package com.github.sats17.saga.order.utils;
 
+import java.util.UUID;
+
 public class OrderUtils {
 	
-	public static Long generateOrderId() {
+	public static String generateOrderId() {
 		long leftLimit = 1000000L;
 	    long rightLimit = 9999999L;
 	    long generatedLong = leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
-	    return generatedLong;
+	    return String.valueOf(generatedLong);
+	}
+	
+	public static String generateUniqueID() {
+        String uniqueID = System.currentTimeMillis() + "-" + UUID.randomUUID().toString();
+        return uniqueID;
+    }
+	
+	public static long generateEpochTimestamp() {
+		return System.currentTimeMillis();
+	}
+	
+	public static void printLog(String message) {
+		System.out.println("ORDER-MS: " + message);
 	}
 
 }

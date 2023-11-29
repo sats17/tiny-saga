@@ -31,12 +31,12 @@ public class OrderRestController {
 
 	@PostMapping()
 	public ResponseEntity<FinalResponse<Order>> createOrder( @RequestBody CreateOrderSchema orderSchema) throws Exception {
-		Long orderId = OrderUtils.generateOrderId();
+		String orderId = OrderUtils.generateOrderId();
 		return ApiResponseUtility.successResponseCreator(orderService.createOrder(orderId, orderSchema.getUserId(), orderSchema.getProductId()));
 	}
 	
 	@GetMapping("/{orderId}")
-	public ResponseEntity<FinalResponse<Order>> getOrder( @PathVariable Long orderId) throws Exception {
+	public ResponseEntity<FinalResponse<Order>> getOrder( @PathVariable String orderId) throws Exception {
 		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
 	}
 

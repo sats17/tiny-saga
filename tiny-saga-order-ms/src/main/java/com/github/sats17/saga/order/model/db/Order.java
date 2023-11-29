@@ -1,5 +1,6 @@
 package com.github.sats17.saga.order.model.db;
 
+import com.github.sats17.saga.order.configuration.Enums;
 import com.github.sats17.saga.order.enums.Status;
 
 import jakarta.persistence.Entity;
@@ -7,17 +8,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "order")
-public class Order {
+@Table(name = "orders")
+public class Order  {
 
 	@Id
-	private Long orderId;
+	private String orderId;
 
 	private String userId;
 
-	private Status status;
+	private Enums.OrderStatus status;
 
-	private Long productId;
+	private String productId;
 
 	private Long quantity;
 	private Long price;
@@ -33,11 +34,11 @@ public class Order {
 		this.statusInfo = statusInfo;
 	}
 
-	public Long getOrderId() {
+	public String getOrderId() {
 		return orderId;
 	}
 
-	public void setOrderId(Long orderId) {
+	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
 
@@ -81,20 +82,22 @@ public class Order {
 		this.updateAt = updateAt;
 	}
 
-	public Long getProductId() {
+	public String getProductId() {
 		return productId;
 	}
 
-	public void setProductId(Long productId) {
+	public void setProductId(String productId) {
 		this.productId = productId;
 	}
 
-	public Status getStatus() {
+	public Enums.OrderStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(Status status) {
+	public void setStatus(Enums.OrderStatus status) {
 		this.status = status;
 	}
+
+
 
 }

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.github.sats17.saga.order.model.db.Order;
 
 @Repository
-public interface OrderRepository extends CrudRepository<Order, Long> {
+public interface OrderRepository extends CrudRepository<Order, String> {
 
 }

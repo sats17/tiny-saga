@@ -68,7 +68,7 @@ public class KafkaController {
 		String productId = eventObj.getProductId();
 		Optional<Inventory> inventory = inventoryRepository.findById(productId);
 		if (inventory.isEmpty()) {
-			AppUtils.printLog("No product found in inventory, Check with administrator");
+			AppUtils.printLog("No product found in inventory, Check with administrator. ProductId: "+productId);
 			return false;
 		} else {
 			int rowsAffected = inventoryRepository.updateProductQuantity(productId, eventObj.getProductQuantity());

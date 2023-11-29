@@ -10,10 +10,13 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.github.sats17.saga.order.configuration.Enums;
 import com.github.sats17.saga.order.enums.Status;
 import com.github.sats17.saga.order.model.db.Order;
 import com.github.sats17.saga.order.model.db.OrderStatus;
+import com.github.sats17.saga.order.model.request.KafkaEventRequest;
 import com.github.sats17.saga.order.repository.OrderRepository;
+import com.github.sats17.saga.order.utils.OrderUtils;
 
 @Service
 public class OrderService {
@@ -32,15 +35,27 @@ public class OrderService {
 	
 	ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
 	
-	public Order createOrder(Long orderId, String userId, Long productId) throws Exception {
+	public Order createOrder(String orderId, String userId, String productId) throws Exception {
 		Order order = new Order();
 		order.setOrderId(orderId);
 		order.setProductId(productId);
 		order.setUserId(userId);
-		order.setOrderStatus(Status.Initialized);
 		Order responseOrder = orderRepository.save(order);
 		if(responseOrder.getOrderId() != null) {
-			publishMessageToTopic(groupId,  writer.writeValueAsString(responseOrder));
+			KafkaEventRequest orderEvent = new KafkaEventRequest();
+			orderEvent.setEventId(OrderUtils.generateUniqueID());
+			orderEvent.setCorrelationId(OrderUtils.generateUniqueID());
+			orderEvent.setEventName(Enums.EventName.ORDER_INITIATED);
+			orderEvent.setOrderId(responseOrder.getOrderId());
+			orderEvent.setOrderStatus(Enums.OrderStatus.INITIATED);
+			orderEvent.setPaymentType(Enums.PaymentType.WALLET);
+			orderEvent.setPrice(100);
+			orderEvent.setProductId(responseOrder.getProductId());
+			orderEvent.setProductQuantity(1);
+			orderEvent.setTimestamp(OrderUtils.generateEpochTimestamp());
+			orderEvent.setUserId(responseOrder.getUserId());
+			orderEvent.setVersion("1.0");
+			publishMessageToTopic("order-topic",  writer.writeValueAsString(orderEvent));
 			return responseOrder;
 		} else {
 			throw new Exception("Order creation failed");
@@ -52,7 +67,7 @@ public class OrderService {
 		kafkaTemplate.send(topicName, message);
 	}
 
-	public Order getOrder(Long orderId) throws Exception {
+	public Order getOrder(String orderId) throws Exception {
 		Optional<Order> order = orderRepository.findById(orderId);
 		 if(order.isPresent()) {
 			 return order.get();
