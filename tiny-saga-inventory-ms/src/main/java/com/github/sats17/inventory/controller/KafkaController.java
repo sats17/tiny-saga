@@ -53,7 +53,7 @@ public class KafkaController {
 				}
 				break;
 			default:
-				AppUtils.printLog("Event not supported");
+				AppUtils.printLog("UNKNOWN Event not supported");
 				break;
 			}
 		} catch (Exception e) {

@@ -32,7 +32,8 @@ public class OrderRestController {
 	@PostMapping()
 	public ResponseEntity<FinalResponse<Order>> createOrder( @RequestBody CreateOrderSchema orderSchema) throws Exception {
 		String orderId = OrderUtils.generateOrderId();
-		return ApiResponseUtility.successResponseCreator(orderService.createOrder(orderId, orderSchema.getUserId(), orderSchema.getProductId()));
+		return ApiResponseUtility.successResponseCreator(orderService.createOrder(orderId, orderSchema.getUserId(), orderSchema.getProductId()
+				, orderSchema.getPrice(), orderSchema.getProductQuantity()));
 	}
 	
 	@GetMapping("/{orderId}")

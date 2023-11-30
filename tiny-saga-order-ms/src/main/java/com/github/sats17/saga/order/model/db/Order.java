@@ -9,22 +9,39 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "orders")
-public class Order  {
+public class Order {
 
 	@Id
 	private String orderId;
 
 	private String userId;
 
-	private Enums.OrderStatus status;
+	private Enums.OrderStatus orderStatus;
+	private Enums.PaymentStatus paymentStatus;
 
 	private String productId;
 
-	private Long quantity;
+	private int quantity;
 	private Long price;
 	private Long createdAt;
 	private Long updateAt;
 	private String statusInfo;
+
+	public Enums.OrderStatus getOrderStatus() {
+		return orderStatus;
+	}
+
+	public void setOrderStatus(Enums.OrderStatus orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+
+	public Enums.PaymentStatus getPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(Enums.PaymentStatus paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
 
 	public String getStatusInfo() {
 		return statusInfo;
@@ -50,11 +67,11 @@ public class Order  {
 		this.userId = userId;
 	}
 
-	public Long getQuantity() {
+	public int getQuantity() {
 		return quantity;
 	}
 
-	public void setQuantity(Long quantity) {
+	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
 
@@ -89,15 +106,5 @@ public class Order  {
 	public void setProductId(String productId) {
 		this.productId = productId;
 	}
-
-	public Enums.OrderStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(Enums.OrderStatus status) {
-		this.status = status;
-	}
-
-
 
 }

@@ -4,6 +4,24 @@ public class CreateOrderSchema {
 
 	private String userId;
 	private String productId;
+	private long price;
+	private int productQuantity;
+
+	public long getPrice() {
+		return price;
+	}
+
+	public void setPrice(long price) {
+		this.price = price;
+	}
+
+	public int getProductQuantity() {
+		return productQuantity;
+	}
+
+	public void setProductQuantity(int productQuantity) {
+		this.productQuantity = productQuantity;
+	}
 
 	public String getUserId() {
 		return userId;

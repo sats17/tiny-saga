@@ -35,11 +35,16 @@ public class OrderService {
 	
 	ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
 	
-	public Order createOrder(String orderId, String userId, String productId) throws Exception {
+	public Order createOrder(String orderId, String userId, String productId, Long price, int productQuantity) throws Exception {
 		Order order = new Order();
 		order.setOrderId(orderId);
 		order.setProductId(productId);
 		order.setUserId(userId);
+		order.setPrice(price);
+		order.setQuantity(productQuantity);
+		order.setCreatedAt(OrderUtils.generateEpochTimestamp());
+		order.setUpdateAt(OrderUtils.generateEpochTimestamp());
+		
 		Order responseOrder = orderRepository.save(order);
 		if(responseOrder.getOrderId() != null) {
 			KafkaEventRequest orderEvent = new KafkaEventRequest();
@@ -49,9 +54,9 @@ public class OrderService {
 			orderEvent.setOrderId(responseOrder.getOrderId());
 			orderEvent.setOrderStatus(Enums.OrderStatus.INITIATED);
 			orderEvent.setPaymentType(Enums.PaymentType.WALLET);
-			orderEvent.setPrice(100);
+			orderEvent.setPrice(price);
 			orderEvent.setProductId(responseOrder.getProductId());
-			orderEvent.setProductQuantity(1);
+			orderEvent.setProductQuantity(productQuantity);
 			orderEvent.setTimestamp(OrderUtils.generateEpochTimestamp());
 			orderEvent.setUserId(responseOrder.getUserId());
 			orderEvent.setVersion("1.0");
