@@ -46,13 +46,25 @@ public class KafkaController {
 			case PAYMENT_DONE:
 				Optional<Order> order = orderRepository.findById(eventObj.getOrderId());
 				if(order.isPresent()) {
-					order.get().setStatus(Enums.OrderStatus.ORDER_PlACED);
+					order.get().setPaymentStatus(Enums.PaymentStatus.PAYMENT_DONE);
+					order.get().setUpdateAt(OrderUtils.generateEpochTimestamp());
+					orderRepository.save(order.get());
+					OrderUtils.printLog("PAYMENT_DONE: Updted order status to payment done");
 				} else {
 					OrderUtils.printLog("Order data not found for orderId: "+eventObj.getOrderId());
 				}
 				break;
 			case INVENTORY_RESERVERVED:
-				OrderUtils.printLog("INVENTORY_RESERVERVED Event recieved");
+				Optional<Order> orderData = orderRepository.findById(eventObj.getOrderId());
+				if(orderData.isPresent()) {
+					orderData.get().setOrderStatus(Enums.OrderStatus.ORDER_PlACED);
+					orderData.get().setUpdateAt(OrderUtils.generateEpochTimestamp());
+					orderRepository.save(orderData.get());
+					OrderUtils.printLog("PAYMENT_DONE: Updted order status to payment done");
+					OrderUtils.printLog("Sending message to user as order is placed");
+				} else {
+					OrderUtils.printLog("Order data not found for orderId: "+eventObj.getOrderId());
+				}
 				break;
 			default:
 				OrderUtils.printLog("Event not supported");
