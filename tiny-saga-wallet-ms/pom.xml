@@ -6,9 +6,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.gitub.sats17</groupId>
-		<artifactId>tiny-saga</artifactId>
-		<version>1.0-SNAPSHOT</version>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.1.0</version>
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>com.gitub.sats17</groupId>
@@ -16,7 +17,13 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>tiny-saga-wallet-ms</name>
 
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/sats17/tiny-saga</url>
+
+	<properties>
+		<java.version>17</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -55,4 +62,13 @@
 		</dependency>
 
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
