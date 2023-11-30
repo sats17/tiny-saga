@@ -61,6 +61,7 @@ public class KafkaController {
 					orderData.get().setUpdateAt(OrderUtils.generateEpochTimestamp());
 					orderRepository.save(orderData.get());
 					OrderUtils.printLog("PAYMENT_DONE: Updted order status to payment done");
+					OrderUtils.printLog("Sending message to user as order is placed");
 				} else {
 					OrderUtils.printLog("Order data not found for orderId: "+eventObj.getOrderId());
 				}
