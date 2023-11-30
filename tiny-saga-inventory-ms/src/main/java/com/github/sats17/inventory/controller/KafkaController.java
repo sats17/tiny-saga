@@ -50,6 +50,9 @@ public class KafkaController {
 				if(status) {
 					AppUtils.printLog("Inventory reserved for product "+eventObj.getProductId());
 					sendInventoryReservedEvent(eventObj);
+				} else {
+					AppUtils.printLog("Inventory reservation failed, sending event for inventory reservation failed");
+					sendInventoryReservedFailEvent(eventObj);
 				}
 				break;
 			default:
@@ -103,4 +106,24 @@ public class KafkaController {
 		String data = AppUtils.convertObjectToJsonString(pushRequest);
 		publishMessageToTopic("order-topic", data);
 	}
+
+	private void sendInventoryReservedFailEvent(KafkaEventRequest request) {
+		KafkaEventRequest pushRequest = new KafkaEventRequest();
+		pushRequest.setEventId(AppUtils.generateUniqueID());
+		pushRequest.setCorrelationId(request.getCorrelationId());
+		pushRequest.setEventName(EventName.INVENTORY_INSUFFICIENT);
+		pushRequest.setVersion("1.0");
+		pushRequest.setTimestamp(AppUtils.generateEpochTimestamp());
+		pushRequest.setOrderId(request.getOrderId());
+		pushRequest.setUserId(request.getUserId());
+		pushRequest.setOrderStatus(OrderStatus.ORDER_PlACED);
+		pushRequest.setPaymentStatus(PaymentStatus.PAYMENT_DONE);
+		pushRequest.setProductId(request.getProductId());
+		pushRequest.setProductQuantity(request.getProductQuantity());
+		System.out.println(pushRequest.toString());
+		String data = AppUtils.convertObjectToJsonString(pushRequest);
+		publishMessageToTopic("order-topic", data);
+	}
+
+	
 }
