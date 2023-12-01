@@ -87,6 +87,86 @@ public class KafkaController {
 	private void processInventoryInsufficientEvent(KafkaEventRequest event) {
 		System.out.println("Processing inventory insufficient event");
 	}
+	
+	public void callWalletMSToCreditAmount(KafkaEventRequest event) {
+		String baseUrl = walletMsHost + walletMsBasePath + "/credit";
+
+		StringBuilder urlBuilder = new StringBuilder(baseUrl);
+		urlBuilder.append("?userId=").append(event.getUserId().trim());
+		urlBuilder.append("&amount=").append(event.getPrice());
+		AppUtils.printLog("Wallet ms URL = " + urlBuilder.toString());
+		URI uri = null;
+		try {
+			uri = new URI(urlBuilder.toString());
+		} catch (URISyntaxException e) {
+			AppUtils.printLog("Invalid Wallet MS URL");
+			e.printStackTrace();
+			return;
+		}
+
+		HttpEntity<String> requestEntity = new HttpEntity<>(null);
+		try {
+			ResponseEntity<WalletMsResponse> responseEntity = restTemplate.exchange(uri, HttpMethod.POST, requestEntity,
+					WalletMsResponse.class);
+
+			if (responseEntity.getStatusCode().is2xxSuccessful()) {
+				WalletMsResponse response = responseEntity.getBody();
+				if(response == null) {
+					AppUtils.printLog("Null repsonse from wallet MS, response is not matching as per contract");
+					// TODO: Refund fail event
+				} else if (response.getStatus() == 20000) {
+					AppUtils.printLog("Amount debited successfully for userId "+event.getUserId());
+					Transaction transaction = buildTransaction(event, "Refund is succeed", PaymentStatus.REFUND_DONE, 
+							TransactionType.DEPOSIT);
+					updateTransaction(transaction);
+					sendPaymentDoneEvent(event);
+				}  else {
+					// TODO: Refund fail event
+					Transaction transaction = buildTransaction(event, "Refund cannot be proceed", PaymentStatus.REFUND_FAILED, 
+							TransactionType.DEPOSIT);
+					updateTransaction(transaction);
+					AppUtils.printLog("Invalid repsonse code from wallet MS, response is not matching as per contract. Repsonse -> "+response.toString());
+				}
+			} else {
+				// TODO: Refund fail event
+				Transaction transaction = buildTransaction(event, "Refund cannot be proceed", PaymentStatus.REFUND_FAILED, 
+						TransactionType.DEPOSIT);
+				updateTransaction(transaction);
+				AppUtils.printLog("Http status code received from wallet ms is not as per contract, Status code "+responseEntity.getStatusCode());
+			}
+		} catch (HttpClientErrorException e) {
+			// TODO: Refund fail event
+			if(e.getStatusCode().equals(HttpStatusCode.valueOf(406))) {
+				WalletMsResponse response = e.getResponseBodyAs(WalletMsResponse.class);
+				if(response == null) {
+					AppUtils.printLog("Invalid repsonse from wallet MS");
+					e.printStackTrace();
+				} else if(response.getStatus() == 40001) {
+					AppUtils.printLog("Insufficient balance in wallet for user id "+event.getUserId().trim());
+				} else {
+					AppUtils.printLog("Something went wrong from wallet ms. Response -> "+ response.toString());
+				}
+			} else if(e.getStatusCode().equals(HttpStatusCode.valueOf(400))) {
+				WalletMsResponse response = e.getResponseBodyAs(WalletMsResponse.class);
+				if(response == null) {
+					AppUtils.printLog("Invalid repsonse from wallet MS");
+					e.printStackTrace();
+				} else if(response.getStatus() == 40002) {
+					AppUtils.printLog("User Id not present in wallet "+event.getUserId().trim());
+				} else {
+					AppUtils.printLog("Something went wrong from wallet ms. Response -> "+ response.toString());
+				}
+			}
+			Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+					TransactionType.WITHDRAWAL);
+			updateTransaction(transaction);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
+					TransactionType.WITHDRAWAL);
+			updateTransaction(transaction);
+		}
+	}
 
 	public void callWalletMSToDebitAmount(KafkaEventRequest event) {
 		String baseUrl = walletMsHost + walletMsBasePath + "/debit";
@@ -118,7 +198,7 @@ public class KafkaController {
 					Transaction transaction = buildTransaction(event, "Amount debit is done", PaymentStatus.PAYMENT_DONE, 
 							TransactionType.WITHDRAWAL);
 					updateTransaction(transaction);
-					sendPaymentDoneEvent(event);
+					sendRefundDoneEvent(event);
 				}  else {
 					Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
 							TransactionType.WITHDRAWAL);
@@ -201,7 +281,23 @@ public class KafkaController {
 		pushRequest.setPaymentStatus(PaymentStatus.PAYMENT_DONE);
 		pushRequest.setProductId(request.getProductId());
 		pushRequest.setProductQuantity(request.getProductQuantity());
-		System.out.println(pushRequest.toString());
+		String data = AppUtils.convertObjectToJsonString(pushRequest);
+		publishMessageToTopic("order-topic", data);
+	}
+	
+	private void sendRefundDoneEvent(KafkaEventRequest request) {
+		KafkaEventRequest pushRequest = new KafkaEventRequest();
+		pushRequest.setEventId(AppUtils.generateUniqueID());
+		pushRequest.setCorrelationId(request.getCorrelationId());
+		pushRequest.setEventName(EventName.REFUND_DONE);
+		pushRequest.setVersion("1.0");
+		pushRequest.setTimestamp(AppUtils.generateEpochTimestamp());
+		pushRequest.setOrderId(request.getOrderId());
+		pushRequest.setUserId(request.getUserId());
+		pushRequest.setOrderStatus(OrderStatus.ORDER_FAIL);
+		pushRequest.setPaymentStatus(PaymentStatus.REFUND_FAILED);
+		pushRequest.setProductId(request.getProductId());
+		pushRequest.setProductQuantity(request.getProductQuantity());
 		String data = AppUtils.convertObjectToJsonString(pushRequest);
 		publishMessageToTopic("order-topic", data);
 	}
