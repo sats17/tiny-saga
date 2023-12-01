@@ -78,7 +78,9 @@ Payment page~~
 ### 4) Inventory insufficient flow and refund payment -
 * When the Inventory microservice publishes the "InventoryInsufficient" event, the Payment microservice listens for this event.
 * Upon receiving the "InventoryInsufficient" event, the Payment microservice initiates a refund process by calling the Wallet microservice to credit the amount back to the user's wallet. Once the refund is successful, the Payment microservice publishes a "RefundSucceeded" event. If the refund fails for any reason, it publishes a "RefundFailed" event with a reason.
-* The Order microservice listens for the "RefundSucceeded" and "RefundFailed" events. If it receives a "RefundSucceeded" event, it updates the order status to "Failed" with a reason indicating that the inventory was insufficient, and the refund was successful. If it receives a "RefundFailed" event, it updates the order status to "Failed" and stores the reason for the failure (inventory insufficiency and refund-related issues).
+* The Order microservice listens for "InventoryInsufficient" event, the Order microservice will update order with Payment Refund initiated. And Order microservice should notified via
+SMS That inventory insufficient.
+* The Order microservice listens for the "RefundSucceeded" and "RefundFailed" events. If it receives a "RefundSucceeded" event, it updates the order status to "Failed" with a reason indicating that the inventory was insufficient, and the refund was successful. And it should notified via SMS that refund is done. If it receives a "RefundFailed" event, it updates the order status to "Failed" and stores the reason for the failure (inventory insufficiency and refund-related issues). Refund failed is critical and it need to check.
 
 
 
