@@ -21,20 +21,20 @@ public class ApiController {
 	@Autowired
 	TransactionRepository transactionRepository;
 
-	@GetMapping("/healthcheck")
+	@GetMapping("/dev/healthcheck")
 	public String getHealthCheck() {
 		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
 		return "ok ok health from transaction";
 	}
 
-	@GetMapping("/transactions")
+	@GetMapping("/dev/transactions")
 	public List<Transaction> getAllTransactions() {
 		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
 		Iterable<Transaction> transactionIterable = transactionRepository.findAll();
 		return StreamSupport.stream(transactionIterable.spliterator(), false).toList();
 	}
 
-	@GetMapping("/transactions/order")
+	@GetMapping("/dev/transactions/order")
 	public List<Transaction> getAllTransactionsForOrder(@RequestParam String orderId) {
 		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
 		Iterable<Transaction> transactionIterable = transactionRepository.findAll();

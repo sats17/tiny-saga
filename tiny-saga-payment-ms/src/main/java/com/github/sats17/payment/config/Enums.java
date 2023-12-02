@@ -7,7 +7,8 @@ public class Enums {
 		PAYMENT_FAIL,
 		INVENTORY_INSUFFICIENT,
 		INVENTORY_RESERVERVED,
-		PAYMENT_DONE
+		PAYMENT_DONE,
+		REFUND_DONE
 	}
 
 	public enum OrderStatus {
@@ -21,7 +22,8 @@ public class Enums {
 		@Deprecated
 		PAYMENT_DONE,
 		ORDER_PlACED,
-		ORDER_DELIEVERED
+		ORDER_DELIEVERED,
+		ORDER_FAIL
 	}
 
 	public enum PaymentType {
@@ -37,7 +39,12 @@ public class Enums {
 		PAYMENT_DONE,
 		PAYMENT_FAILED,
 		REFUND_INITIATED,
-		REFUND_DONE
+		REFUND_DONE,
+		REFUND_FAILED
+	}
+	
+	public enum PaymentFailReason {
+		INSUFFICIENT_FUND, PAYMENT_SERVER_ERROR
 	}
 	
 }
