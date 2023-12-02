@@ -1,6 +1,9 @@
 package com.github.sats17.wallet.controller;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,7 +27,7 @@ public class WalletController {
 	@Autowired
 	private WalletRepository walletRepository;
 
-	@GetMapping("/amount")
+	@GetMapping("/dev/amount")
 	public ResponseEntity<Response> getAmount(@RequestParam String userId) {
 		Optional<Wallet> walletOptional = walletRepository.findById(userId);
 		if (walletOptional.isPresent()) {
@@ -36,8 +39,16 @@ public class WalletController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}
+	
+	@GetMapping("/dev/wallets")
+	public List<Wallet> getUsers() {
+		AppUtils.printLog("Data present in wallet DB " + walletRepository.count());
+		Iterable<Wallet> transactionIterable = walletRepository.findAll();
+		return StreamSupport.stream(transactionIterable.spliterator(), false)
+                .collect(Collectors.toList());
+	}
 
-	@PostMapping("/amount")
+	@PostMapping("/dev/amount")
 	public ResponseEntity<Response> postAmount(@RequestParam String userId, @RequestParam Double amount) {
 		Optional<Wallet> walletOptional = walletRepository.findById(userId);
 		if (walletOptional.isPresent()) {
