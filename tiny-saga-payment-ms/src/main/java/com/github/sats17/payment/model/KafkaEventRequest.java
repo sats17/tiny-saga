@@ -23,6 +23,7 @@ public class KafkaEventRequest {
 	private String productId;
 	private int productQuantity;
 	private long price;
+	private String paymentFailReason;
 
 	public String getEventId() {
 		return eventId;
@@ -134,6 +135,14 @@ public class KafkaEventRequest {
 				+ ", version=" + version + ", timestamp=" + timestamp + ", orderId=" + orderId + ", userId=" + userId
 				+ ", orderStatus=" + orderStatus + ", paymentStatus=" + paymentStatus + ", paymentType=" + paymentType
 				+ ", productId=" + productId + ", productQuantity=" + productQuantity + ", price=" + price + "]";
+	}
+
+	public String getPaymentFailReason() {
+		return paymentFailReason;
+	}
+
+	public void setPaymentFailReason(String paymentFailReason) {
+		this.paymentFailReason = paymentFailReason;
 	}
 	
 	

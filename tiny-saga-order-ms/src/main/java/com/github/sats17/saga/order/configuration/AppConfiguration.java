@@ -1,15 +1,14 @@
-package com.github.sats17.payment.config;
+package com.github.sats17.saga.order.configuration;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Configuration
-public class AppConfig {
+public class AppConfiguration {
 
+	
 	@Bean
 	public ObjectMapper mapper() {
 		return new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -19,5 +18,4 @@ public class AppConfig {
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
-
 }

@@ -41,18 +41,6 @@ public class KafkaController {
 			case ORDER_INITIATED:
 				OrderUtils.printLog("ORDER_INITIATED Event not supported");
 				break;
-			case INVENTORY_INSUFFICIENT:
-				OrderUtils.printLog("INVENTORY_INSUFFICIENT Event not supported");
-				if(order.isPresent()) {
-					order.get().setPaymentStatus(Enums.PaymentStatus.REFUND_INITIATED);
-					order.get().setUpdateAt(OrderUtils.generateEpochTimestamp());
-					order.get().setOrderStatus(Enums.OrderStatus.ORDER_FAIL);
-					orderRepository.save(order.get());
-					OrderUtils.printLog("INVENTORY_INSUFFICIENT: Updted order status to refund initiated and order fail.");
-				} else {
-					OrderUtils.printLog("Order data not found for orderId: "+eventObj.getOrderId());
-				}
-				break;
 			case PAYMENT_DONE:
 				if(order.isPresent()) {
 					order.get().setPaymentStatus(Enums.PaymentStatus.PAYMENT_DONE);
@@ -74,6 +62,32 @@ public class KafkaController {
 					OrderUtils.printLog("Order data not found for orderId: "+eventObj.getOrderId());
 				}
 				break;
+			case INVENTORY_INSUFFICIENT:
+				OrderUtils.printLog("INVENTORY_INSUFFICIENT Event not supported");
+				if(order.isPresent()) {
+					order.get().setPaymentStatus(Enums.PaymentStatus.REFUND_INITIATED);
+					order.get().setUpdateAt(OrderUtils.generateEpochTimestamp());
+					order.get().setOrderStatus(Enums.OrderStatus.ORDER_FAIL);
+					order.get().setOrderFailReason(eventObj.getInventoryFailReason());
+					orderRepository.save(order.get());
+					OrderUtils.printLog("INVENTORY_INSUFFICIENT: Updted order status to refund initiated and order fail.");
+				} else {
+					OrderUtils.printLog("Order data not found for orderId: "+eventObj.getOrderId());
+				}
+				break;
+			case PAYMENT_FAIL:
+				if(order.isPresent()) {
+					order.get().setPaymentStatus(Enums.PaymentStatus.PAYMENT_FAILED);
+					order.get().setOrderStatus(Enums.OrderStatus.ORDER_FAIL);
+					order.get().setUpdateAt(OrderUtils.generateEpochTimestamp());
+					order.get().setOrderFailReason(eventObj.getPaymentFailReason());
+					orderRepository.save(order.get());
+					OrderUtils.printLog("PAYMENT_DONE: Updted order status to payment done");
+				} else {
+					OrderUtils.printLog("Order data not found for orderId: "+eventObj.getOrderId());
+				}
+				break;
+
 			default:
 				OrderUtils.printLog("Event not supported");
 				break;

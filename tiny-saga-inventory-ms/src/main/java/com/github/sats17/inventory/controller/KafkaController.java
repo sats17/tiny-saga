@@ -120,7 +120,7 @@ public class KafkaController {
 		pushRequest.setPaymentStatus(PaymentStatus.PAYMENT_DONE);
 		pushRequest.setProductId(request.getProductId());
 		pushRequest.setProductQuantity(request.getProductQuantity());
-		System.out.println(pushRequest.toString());
+		pushRequest.setInventoryFailReason("INSUFFICIENT INVENTORY");
 		String data = AppUtils.convertObjectToJsonString(pushRequest);
 		publishMessageToTopic("order-topic", data);
 	}

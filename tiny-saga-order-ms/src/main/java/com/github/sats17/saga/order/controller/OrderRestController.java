@@ -49,7 +49,7 @@ public class OrderRestController {
 		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
 	}
 	
-	@GetMapping("/orders")
+	@GetMapping("/dev/orders")
 	public List<Order> getAllProducts() {
 		OrderUtils.printLog("Data present in orders DB " + repository.count());
 		Iterable<Order> transactionIterable = repository.findAll();

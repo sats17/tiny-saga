@@ -18,6 +18,7 @@ public class Order {
 
 	private Enums.OrderStatus orderStatus;
 	private Enums.PaymentStatus paymentStatus;
+	private String orderFailReason;
 
 	private String productId;
 
@@ -105,6 +106,14 @@ public class Order {
 
 	public void setProductId(String productId) {
 		this.productId = productId;
+	}
+
+	public String getOrderFailReason() {
+		return orderFailReason;
+	}
+
+	public void setOrderFailReason(String orderFailReason) {
+		this.orderFailReason = orderFailReason;
 	}
 
 }
