@@ -87,7 +87,17 @@ public class KafkaController {
 					OrderUtils.printLog("Order data not found for orderId: "+eventObj.getOrderId());
 				}
 				break;
-
+			case REFUND_DONE:
+				if(order.isPresent()) {
+					order.get().setPaymentStatus(Enums.PaymentStatus.REFUND_DONE);
+					order.get().setOrderStatus(Enums.OrderStatus.ORDER_FAIL);
+					order.get().setUpdateAt(OrderUtils.generateEpochTimestamp());
+					orderRepository.save(order.get());
+					OrderUtils.printLog("PAYMENT_DONE: Updted order status to payment done");
+				} else {
+					OrderUtils.printLog("Order data not found for orderId: "+eventObj.getOrderId());
+				}
+				break;
 			default:
 				OrderUtils.printLog("Event not supported");
 				break;

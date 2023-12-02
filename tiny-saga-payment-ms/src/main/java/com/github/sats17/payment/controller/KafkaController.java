@@ -86,6 +86,7 @@ public class KafkaController {
 
 	private void processInventoryInsufficientEvent(KafkaEventRequest event) {
 		System.out.println("Processing inventory insufficient event");
+		callWalletMSToCreditAmount(event);
 	}
 
 	// Method used for refund amount

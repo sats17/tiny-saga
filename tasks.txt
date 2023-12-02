@@ -1,3 +1,7 @@
 Stack =
 Check order flow again from postman = Done
 Seperate services from multi module to single projects = Done
+Update ReadMe and diagram for refund done event = Pending
+Create script or image to run services without STS= pending
+Create API Gateway from spring cloud, use rate limiting = Pending
+Create load test script = Pending
