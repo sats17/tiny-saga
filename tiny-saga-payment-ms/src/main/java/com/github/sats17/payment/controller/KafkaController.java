@@ -119,7 +119,7 @@ public class KafkaController {
 					Transaction transaction = buildTransaction(event, "Refund is succeed", PaymentStatus.REFUND_DONE, 
 							TransactionType.DEPOSIT);
 					updateTransaction(transaction);
-					sendPaymentDoneEvent(event);
+					sendRefundDoneEvent(event);
 				}  else {
 					// TODO: Refund fail event
 					Transaction transaction = buildTransaction(event, "Refund cannot be proceed", PaymentStatus.REFUND_FAILED, 
@@ -198,7 +198,7 @@ public class KafkaController {
 					Transaction transaction = buildTransaction(event, "Amount debit is done", PaymentStatus.PAYMENT_DONE, 
 							TransactionType.WITHDRAWAL);
 					updateTransaction(transaction);
-					sendRefundDoneEvent(event);
+					sendPaymentDoneEvent(event);
 				}  else {
 					Transaction transaction = buildTransaction(event, "Payment cannot be proceed", PaymentStatus.PAYMENT_FAILED, 
 							TransactionType.WITHDRAWAL);
