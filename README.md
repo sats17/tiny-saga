@@ -220,11 +220,55 @@ SMS That inventory insufficient.
   "transactionId": "550sf1100-e29b-41d4-a716-446655440000",
   "productId" : "123asf-sfa-2a",
   "productQuantity": 2,
-  "isPartialOrder": false // Indicates when some amount of quantity is available
+  "inventoryFailReason": "INVENTORY NOT AVAILABLE"
 }
 ```
 * triggered by = Inventory MS
 * Listen by = Order MS, Payment MS
+
+### Refund Initiated event
+* payload
+```
+{
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
+  "eventName": "REFUND_INITIATED",
+  "version": "1.0",
+  "timestamp": "2023-05-01T12:34:56Z",
+  "orderId": "12345",
+  "userId": "67890",
+  "orderStatus": "ORDER_FAIL",
+  "paymentType": "WALLET",
+  "transactionId": "550sf1100-e29b-41d4-a716-446655440000",
+  "productId" : "123asf-sfa-2a",
+  "productQuantity": 2,
+  "isPartialOrder": false // Indicates when some amount of quantity is available
+}
+```
+* triggered by = Payment MS
+* Listen by = Order MS, Notification MS
+
+### Refund Done event
+* payload
+```
+{
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "correlationId": "8a2e2d59-9d36-4b87-8ae0-2a4eef7f6",
+  "eventName": "REFUND_DONE",
+  "version": "1.0",
+  "timestamp": "2023-05-01T12:34:56Z",
+  "orderId": "12345",
+  "userId": "67890",
+  "orderStatus": "ORDER_FAIL",
+  "paymentType": "WALLET",
+  "transactionId": "550sf1100-e29b-41d4-a716-446655440000",
+  "productId" : "123asf-sfa-2a",
+  "productQuantity": 2,
+  "isPartialOrder": false // Indicates when some amount of quantity is available
+}
+```
+* triggered by = Payment MS
+* Listen by = Order MS, Notification MS
 
 ## Kafka design
 * Single topic -> Yes order-topic. Each microservice will ignore the event that they don't want.
