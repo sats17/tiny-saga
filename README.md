@@ -43,8 +43,8 @@ Key operations:
 * Check product availability
 * Update stock levels
 
-### Orchestrator Microservice (Orchestrator MS)
-This microservice is responsible for coordinating the actions of other microservices using the saga pattern.
+### Notification Microservice
+This microservice is responsible for sending notification to users
 
 ## User Journey
 1) User clicks on order with selected payment mode -> Backend call will be trigger, it will take payment and place order (edge cases of insufficient fund or inventory insufficient are async flow)
