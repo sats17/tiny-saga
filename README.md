@@ -27,6 +27,7 @@ The Payment MS is responsible for processing payments, including traditional pay
 Key operations:
 * Process payment
 * Verify wallet balance
+* Send notification to user about payment.
 
 ### Wallet Microservice (Wallet MS)
 This microservice manages user wallets, including checking the available balance and updating the wallet upon successful payment.
