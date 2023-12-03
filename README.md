@@ -277,12 +277,12 @@ SMS That inventory insufficient.
 * Application needs to ignore the message if they are not consumers of that message, and those eventTypes or eventName will be configurable outside code.
 
 ## Questions and Considerations
-* What specific information will be included in the event published to Kafka by the Payment MS?
-* Once the Order MS receives the event, how will it update the order status, and what other actions will it perform?
-* Similarly, when the Inventory MS receives the event, how will it update the stock levels and ensure product availability?
+* What specific information will be included in the event published to Kafka by the Payment MS? -> Check events mentioned above.
+* Once the Order MS receives the event, how will it update the order status, and what other actions will it perform? -> Check event mentioned above.
+* Similarly, when the Inventory MS receives the event, how will it update the stock levels and ensure product availability?-> Using distributed locking.
 * How will the system handle scenarios when the wallet does not have enough balance to complete the order? -> It will simple error throw to client and publish event with order fail.
 * How you will handle system failure between payment ms and wallet ms ? -> We will use retry with exponential backoff logic, once limit of retry reached then we will send error to client. And we will mark order as fail.
 * If inventory ms do not have item left -> Early fail will be bettter. Order MS will check in inventory ms if any stock available or not. (This is one option, also from user experience there will be a API call will trigger, before user click on place order. Which will tell stock is available or not.)
 * Why we discarded approach of separte flow of order placed and payment ? -> To avoid incosistency of payment faliure, and get early failback. When user click on place order with payment mode frontend send request to order ms with payment type(wallet, upi). Using this we can avoid incosistency.
-* How inventory can be consistent in multiple replicas of inventory MS ?
+* How inventory can be consistent in multiple replicas of inventory MS ? -> We need to use distributed locking.
 
