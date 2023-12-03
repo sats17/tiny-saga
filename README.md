@@ -7,7 +7,8 @@ Proof of concept implementation of microservices saga pattern.
 ### https://sats17.github.io/tiny-saga/
 
 
-Components
+## Services
+
 ### API Gateway
 The API gateway acts as a single entry point for client requests, providing load balancing, authentication, and rate limiting.
 
