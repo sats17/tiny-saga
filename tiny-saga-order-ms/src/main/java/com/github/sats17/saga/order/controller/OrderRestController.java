@@ -28,7 +28,7 @@ import com.github.sats17.saga.order.utils.OrderUtils;
  *
  */
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/v1/api/order")
 public class OrderRestController {
 	
 	@Autowired
