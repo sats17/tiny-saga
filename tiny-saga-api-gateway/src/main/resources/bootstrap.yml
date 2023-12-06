@@ -1,0 +1,16 @@
+server:
+  port: 8087
+  
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        wiretap: true
+  
+services:
+  order:
+    requestPath: "/v1/saga/order"
+    downstreamPath: "/v1/api/order"
+    downstreamHost: "http://localhost:8081"
+
+  
