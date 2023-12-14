@@ -46,6 +46,41 @@ Key operations:
 ### Notification Microservice
 This microservice is responsible for sending notification to users
 
+## Database
+
+### 1) Order DB
+* OrderId: A unique identifier for the order (Primary Key).
+* UserId: A reference to the user who placed the order (Foreign Key).
+* OrderStatus: An ENUM field representing the order status (e.g., InitializedOrder, PaymentDone, Placed, Failed, Delivered, On-Way, Canceled).
+* ProductId: A reference to the product being ordered (Foreign Key).
+* Quantity: The number of units of the product being ordered.
+* Price: The cost of the product at the time the order was placed.
+* createdAt: Order creation date
+* updateAt: Order update date
+* StatusInfo: Tells more information about status.
+
+### 2) Inventory DB
+* ProductId: A unique identifier for the product (Primary Key).
+* ProductName: The name or title of the product.
+* ProductType: The category or type of the product (e.g., electronics, clothing, etc.).
+* AvailableProductCount: The number of available units of the product in the inventory.
+
+### 3) Wallet DB
+* UserId: A unique identifier for the user (Primary Key). This field can be a foreign key referencing the user's ID in your User table or User microservice.
+* Amount: The current balance of the user's wallet.
+
+### 4) Transaction DB
+* TransactionId: A unique identifier for the transaction (Primary Key).
+* UserId: The ID of the user associated with the transaction. This field can be a foreign key referencing the UserId in the User table or User microservice.
+* OrderId: The ID of the associated order (if applicable). This field can be a foreign key referencing the OrderId in the Order database or can be NULL for transactions not related to orders (e.g., deposits and withdrawals).
+* TransactionType: The type of transaction (e.g., Deposit, Withdrawal, Payment).
+* PaymentStatus: The status of the payment transaction, if applicable (e.g., Pending, Completed, Failed, Refunded). This field can be NULL for non-payment transactions (e.g., deposits and withdrawals).
+* Amount: The amount of the transaction.
+* Currency: The currency used for the transaction (e.g., USD, EUR, GBP).
+* Timestamp: The date and time when the transaction occurred.
+* Description: A brief description or note about the transaction (optional).
+
+
 ## User Journey
 1) User clicks on order with selected payment mode -> Backend call will be trigger, it will take payment and place order (edge cases of insufficient fund or inventory insufficient are async flow)
 2) For wallet payment mode -> Wallet payment mode will be disable, if user have insufficient fund. -> Backend will call to wallet ms to check user funds.
@@ -89,39 +124,6 @@ SMS That inventory insufficient.
 
 
 
-## Database
-
-### 1) Order DB
-* OrderId: A unique identifier for the order (Primary Key).
-* UserId: A reference to the user who placed the order (Foreign Key).
-* OrderStatus: An ENUM field representing the order status (e.g., InitializedOrder, PaymentDone, Placed, Failed, Delivered, On-Way, Canceled).
-* ProductId: A reference to the product being ordered (Foreign Key).
-* Quantity: The number of units of the product being ordered.
-* Price: The cost of the product at the time the order was placed.
-* createdAt: Order creation date
-* updateAt: Order update date
-* StatusInfo: Tells more information about status.
-
-### 2) Inventory DB
-* ProductId: A unique identifier for the product (Primary Key).
-* ProductName: The name or title of the product.
-* ProductType: The category or type of the product (e.g., electronics, clothing, etc.).
-* AvailableProductCount: The number of available units of the product in the inventory.
-
-### 3) Wallet DB
-* UserId: A unique identifier for the user (Primary Key). This field can be a foreign key referencing the user's ID in your User table or User microservice.
-* Amount: The current balance of the user's wallet.
-
-### 4) Transaction DB
-* TransactionId: A unique identifier for the transaction (Primary Key).
-* UserId: The ID of the user associated with the transaction. This field can be a foreign key referencing the UserId in the User table or User microservice.
-* OrderId: The ID of the associated order (if applicable). This field can be a foreign key referencing the OrderId in the Order database or can be NULL for transactions not related to orders (e.g., deposits and withdrawals).
-* TransactionType: The type of transaction (e.g., Deposit, Withdrawal, Payment).
-* PaymentStatus: The status of the payment transaction, if applicable (e.g., Pending, Completed, Failed, Refunded). This field can be NULL for non-payment transactions (e.g., deposits and withdrawals).
-* Amount: The amount of the transaction.
-* Currency: The currency used for the transaction (e.g., USD, EUR, GBP).
-* Timestamp: The date and time when the transaction occurred.
-* Description: A brief description or note about the transaction (optional).
 
 ## Events payload
 ### orderInitiated event
