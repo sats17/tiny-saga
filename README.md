@@ -54,7 +54,7 @@ Payment page~~
 ~~2) User clicks on payment -> Backend /api/payment -> API will trigger and do payment from wallet. Validation if there is no amount available.~~
 
 
-## API Journeys
+## API Journeys (Choreography Pattern)
 
 ### 1) Place a order with wallet payment mode
 * ~~The user initiates the order, and the request goes through the API gateway to the Order MS.~~
