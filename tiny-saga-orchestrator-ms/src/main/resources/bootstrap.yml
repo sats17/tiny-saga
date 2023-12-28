@@ -1,0 +1,11 @@
+server:
+  port: 8084
+  
+springdoc.api-docs.path: /orchestrator-docs
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092
+    group_id: orchestrator-ms
+
+  
