@@ -1,4 +1,4 @@
-package com.gitub.sats17;
+package com.github.sats17.orchestrator;
 
 /**
  * Hello world!
