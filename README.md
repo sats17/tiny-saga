@@ -281,6 +281,10 @@ SMS That inventory insufficient.
 * Consumer Groups for each microservice, so multiple instances/replicas of microservice can receive only one message.
 * Application needs to ignore the message if they are not consumers of that message, and those eventTypes or eventName will be configurable outside code.
 
+### End of choreography pattern
+
+## API Journeys (Orchestration Pattern)
+
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS? -> Check events mentioned above.
 * Once the Order MS receives the event, how will it update the order status, and what other actions will it perform? -> Check event mentioned above.
