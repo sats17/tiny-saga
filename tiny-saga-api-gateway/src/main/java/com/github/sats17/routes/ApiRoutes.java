@@ -21,7 +21,7 @@ public class ApiRoutes {
 	@Bean
 	RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes()
-				.route("v1_create_order", r -> r.path("/v1/saga/order")
+				.route("v1_create_order", r -> r.path(orderRequestPath)
 						.filters(f -> f.rewritePath(orderRequestPath, orderDownStreamPath)).uri(orderDownStreamHost))
 				.build();
 	}

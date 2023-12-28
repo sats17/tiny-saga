@@ -9,7 +9,7 @@ spring:
   
 services:
   order:
-    requestPath: "/v1/saga/order"
+    requestPath: "/v1/order"
     downstreamPath: "/v1/api/order"
     downstreamHost: "http://localhost:8081"
 
