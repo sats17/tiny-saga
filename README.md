@@ -285,6 +285,16 @@ SMS That inventory insufficient.
 
 ## API Journeys (Orchestration Pattern)
 
+### 1) Place a order with wallet payment mode
+* The Order microservice receives a request to create an order. It creates an order with the status "Initiated" and publishes an "OrderInitiated" event.
+* The Orchestrator microservice listens for the "OrderInitiated" event. Upon receiving the event, it routes that call to payment ms.
+* Payment ms then attempts to process the payment by calling HTTP call to the Wallet microservice. If the payment is successful, it publishes a "PaymentSucceeded" event. If the payment fails, it publishes a "PaymentFailed" event with a reason.
+* The Payment MS communicates with the Wallet MS to check if the wallet has enough balance. If so, it subtracts the required amount and confirms the payment.
+* Payment MS then publishes an event to Kafka, which listend by orchestrator ms and o. ms performs event to order ms with latest order status. And then calls Inventory MS with order details.
+
+
+  
+
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS? -> Check events mentioned above.
 * Once the Order MS receives the event, how will it update the order status, and what other actions will it perform? -> Check event mentioned above.
