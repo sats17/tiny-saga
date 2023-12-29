@@ -292,6 +292,12 @@ SMS That inventory insufficient.
 * The Payment MS communicates with the Wallet MS to check if the wallet has enough balance. If so, it subtracts the required amount and confirms the payment.
 * Payment MS then publishes an event to Kafka, which listend by orchestrator ms and o. ms performs event to order ms with latest order status. And then calls Inventory MS with order details.
 
+### 2) Insufficient fund flow for wallet payment mode (Insufficient fund while placing order) -
+* Wallet MS throws error to payment MS with insufficent fund
+* ~~Payment MS will trigger event to kafa and order MS will receive event with insufficent flow~~
+* Payment MS will create event to orchestrator ms.
+* Orchestrator ms will ask order ms(async or api call ?) to update order status and orchestrator ms will call notification service that wallet have not fund.
+
 
   
 
