@@ -5,6 +5,7 @@ Update ReadMe and diagram for refund done event = Done
 Create script or image to run services without STS= Done with local sh
 Create API Gateway from spring cloud, use rate limiting = Pending
 Create load test script = Pending
+
 Create orchestrator MS with non-blocking IO webflux = ongoing
-How to handle microservice down in orchestration service, if payment ms is down then ? =Pending
+How to handle microservice down scenario in orchestration service, like most important if payment ms is down then ? = Pending
 Drawbacks of choreography pattern is that how we will notify customer if any service is down. More concern is, if payment ms is down ?
