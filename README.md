@@ -298,7 +298,9 @@ SMS That inventory insufficient.
 * Payment MS will create event to orchestrator ms.
 * Orchestrator ms will ask order ms(async or api call ?) to update order status and orchestrator ms will call notification service that wallet have not fund.
 
-
+## Kafka design
+* How kafka fits in orchestration pattern ? -> Any request coming to orchestration ms, will send it through kafka. So, it can be async and it will persist the message in broker
+if orchestration ms is down.
   
 
 ## Questions and Considerations
