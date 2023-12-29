@@ -7,5 +7,20 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092
     group_id: orchestrator-ms
+    
+payment:
+  host: localhost
+  port: 8087
+  scheme: http
+  
+inventory:
+  host: localhost
+  port: 8087
+  scheme: http
+ 
+order:
+  host: localhost
+  port: 8081
+  scheme: http
 
   
