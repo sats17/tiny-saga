@@ -1,4 +1,4 @@
-package com.github.sats17.payment.config;
+package com.github.sats17.orchestrator.configurations;
 
 public class Enums {
 
@@ -41,15 +41,6 @@ public class Enums {
 		REFUND_INITIATED,
 		REFUND_DONE,
 		REFUND_FAILED
-	}
-	
-	public enum PaymentProcess {
-		PAY,
-		REFUND
-	}
-	
-	public enum PaymentFailReason {
-		INSUFFICIENT_FUND, PAYMENT_SERVER_ERROR
 	}
 	
 }
