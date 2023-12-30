@@ -43,6 +43,11 @@ public class Enums {
 		REFUND_FAILED
 	}
 	
+	public enum PaymentProcess {
+		PAY,
+		REFUND
+	}
+	
 	public enum PaymentFailReason {
 		INSUFFICIENT_FUND, PAYMENT_SERVER_ERROR
 	}

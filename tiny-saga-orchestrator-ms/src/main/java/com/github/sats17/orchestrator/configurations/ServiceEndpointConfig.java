@@ -12,7 +12,7 @@ public class ServiceEndpointConfig {
 	ConfigProperties configProperties;
 
 	@Bean
-	public ServiceEndpoint paymentConfig() {
+	ServiceEndpoint paymentConfig() {
 		String host = configProperties.getPayment().get("host");
 		String port = configProperties.getPayment().get("port");
 		String protocol = configProperties.getPayment().get("protocol");
