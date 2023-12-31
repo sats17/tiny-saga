@@ -9,4 +9,4 @@ Create load test script = Pending
 Create orchestrator MS with non-blocking IO webflux = ongoing
 How to handle microservice down scenario in orchestration service, like most important if payment ms is down then ? = Pending
 Drawbacks of choreography pattern is that how we will notify customer if any service is down. More concern is, if payment ms is down ?
-Use grpc for intercommunication in orch architecture = pending
+Use grpc for intercommunication in orch architecture = pending ref- https://github.com/grpc-ecosystem/grpc-spring?tab=readme-ov-file https://www.youtube.com/watch?v=2CWYorTWyGs
