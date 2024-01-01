@@ -52,6 +52,14 @@ public class PaymentProcessRequest {
 		this.orderStatus = orderStatus;
 	}
 
+	public PaymentProcess getPaymentProcess() {
+		return paymentProcess;
+	}
+
+	public void setPaymentProcess(PaymentProcess paymentProcess) {
+		this.paymentProcess = paymentProcess;
+	}
+
 	public PaymentType getPaymentType() {
 		return paymentType;
 	}
@@ -92,19 +100,11 @@ public class PaymentProcessRequest {
 		this.paymentFailReason = paymentFailReason;
 	}
 
-	public PaymentProcess getPaymentProcess() {
-		return paymentProcess;
-	}
-
-	public void setPaymentProcess(PaymentProcess paymentProcess) {
-		this.paymentProcess = paymentProcess;
-	}
-
 	@Override
 	public String toString() {
 		return "PaymentProcessRequest [correlationId=" + correlationId + ", orderId=" + orderId + ", userId=" + userId
-				+ ", orderStatus=" + orderStatus + ", paymentProcess=" + paymentProcess + ", paymentType="
-				+ paymentType + ", productId=" + productId + ", productQuantity=" + productQuantity + ", price=" + price
+				+ ", orderStatus=" + orderStatus + ", paymentProcess=" + paymentProcess + ", paymentType=" + paymentType
+				+ ", productId=" + productId + ", productQuantity=" + productQuantity + ", price=" + price
 				+ ", paymentFailReason=" + paymentFailReason + "]";
 	}
 
