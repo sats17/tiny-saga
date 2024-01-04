@@ -17,9 +17,8 @@ import com.github.sats17.payment.model.v2.PaymentProcessRequest;
 import com.github.sats17.payment.service.PaymentService;
 import com.github.sats17.payment.util.AppUtils;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-import  com.github.sats17.temp.proto;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RequestMapping("/v2/api/payment")
 public class PyamentApiController {

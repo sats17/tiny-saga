@@ -3,7 +3,7 @@ package com.github.sats17.payment.model.v2;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.github.sats17.payment.config.Enums.OrderStatus;
-import com.github.sats17.payment.config.Enums.PaymentProcess;
+import com.github.sats17.payment.config.Enums.PaymentProcessType;
 import com.github.sats17.payment.config.Enums.PaymentType;
 
 @JsonInclude(Include.NON_NULL)
@@ -13,7 +13,7 @@ public class PaymentProcessRequest {
 	private String orderId;
 	private String userId;
 	private OrderStatus orderStatus;
-	private PaymentProcess paymentProcess;
+	private PaymentProcessType paymentProcessType;
 	private PaymentType paymentType;
 	private String productId;
 	private int productQuantity;
@@ -52,12 +52,12 @@ public class PaymentProcessRequest {
 		this.orderStatus = orderStatus;
 	}
 
-	public PaymentProcess getPaymentProcess() {
-		return paymentProcess;
+	public PaymentProcessType getPaymentProcessType() {
+		return paymentProcessType;
 	}
 
-	public void setPaymentProcess(PaymentProcess paymentProcess) {
-		this.paymentProcess = paymentProcess;
+	public void setPaymentProcessType(PaymentProcessType paymentProcessType) {
+		this.paymentProcessType = paymentProcessType;
 	}
 
 	public PaymentType getPaymentType() {
@@ -103,8 +103,8 @@ public class PaymentProcessRequest {
 	@Override
 	public String toString() {
 		return "PaymentProcessRequest [correlationId=" + correlationId + ", orderId=" + orderId + ", userId=" + userId
-				+ ", orderStatus=" + orderStatus + ", paymentProcess=" + paymentProcess + ", paymentType=" + paymentType
-				+ ", productId=" + productId + ", productQuantity=" + productQuantity + ", price=" + price
+				+ ", orderStatus=" + orderStatus + ", paymentProcess=" + paymentProcessType + ", paymentType="
+				+ paymentType + ", productId=" + productId + ", productQuantity=" + productQuantity + ", price=" + price
 				+ ", paymentFailReason=" + paymentFailReason + "]";
 	}
 
