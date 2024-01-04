@@ -43,7 +43,7 @@ public class Enums {
 		REFUND_FAILED
 	}
 	
-	public enum PaymentProcess {
+	public enum PaymentProcessType {
 		PAY,
 		REFUND
 	}

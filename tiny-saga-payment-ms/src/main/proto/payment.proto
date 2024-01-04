@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package com.github.sats17.grpc.payment;
+
+option java_multiple_files = true;
+option java_package = "com.github.sats17.grpc.payment";
+
+service PaymentService {
+  rpc processPayment(PaymentRequest) returns (PaymentResponse) {
+  }
+}
+
+message PaymentRequest {
+  string correlation_id = 1;
+  string order_id = 2;
+  string user_id = 3;
+  OrderStatus order_status = 4;
+  PaymentProcessType payment_process_type = 5;
+  PaymentType payment_type = 6;
+  string product_id = 7;
+  int32 product_quantity = 8;
+  int64 price = 9;
+  string payment_fail_reason = 10;
+}
+
+enum OrderStatus {
+  INITIATED = 1;
+  ORDER_PlACED = 2;
+  ORDER_DELIEVERED = 3;
+  ORDER_FAIL = 4;
+}
+
+enum PaymentProcessType {
+  PAY = 1;
+  REFUND = 2;
+}
+
+enum PaymentType {
+  WALLET = 1;
+}
+
+message PaymentResponse {
+  string message = 1;
+}
