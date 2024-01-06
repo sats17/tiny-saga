@@ -90,13 +90,7 @@
 			<version>${grpc.version}</version>
 		</dependency>
 
-		<dependency>
-			<!-- Java 9+ compatibility - Do NOT update to 2.0.0 -->
-			<groupId>jakarta.annotation</groupId>
-			<artifactId>jakarta.annotation-api</artifactId>
-			<version>1.3.5</version>
-			<optional>true</optional>
-		</dependency>
+
 
 		<!-- Other dependencies -->
 		<dependency>

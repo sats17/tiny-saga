@@ -34,23 +34,23 @@ public class PyamentApiController {
 		return "ok ok health from transaction";
 	}
 
-	@GetMapping("/dev/transactions")
-	public List<Transaction> getAllTransactions() {
-		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
-		Iterable<Transaction> transactionIterable = transactionRepository.findAll();
-		return StreamSupport.stream(transactionIterable.spliterator(), false).toList();
-	}
+//	@GetMapping("/dev/transactions")
+//	public List<Transaction> getAllTransactions() {
+//		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
+//		Iterable<Transaction> transactionIterable = transactionRepository.findAll();
+//		return StreamSupport.stream(transactionIterable.spliterator(), false).toList();
+//	}
 
-	@GetMapping("/dev/transactions/order")
-	public List<Transaction> getAllTransactionsForOrder(@RequestParam String orderId) {
-		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
-		Iterable<Transaction> transactionIterable = transactionRepository.findAll();
-		return StreamSupport.stream(transactionIterable.spliterator(), false).filter(transaction -> {
-			return transaction.getOrderId().equals(orderId);
-		}).sorted((t1, t2) -> {
-			return t1.getTimestamp().compareTo(t2.getTimestamp());
-		}).toList();
-	}
+//	@GetMapping("/dev/transactions/order")
+//	public List<Transaction> getAllTransactionsForOrder(@RequestParam String orderId) {
+//		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
+//		Iterable<Transaction> transactionIterable = transactionRepository.findAll();
+//		return StreamSupport.stream(transactionIterable.spliterator(), false).filter(transaction -> {
+//			return transaction.getOrderId().equals(orderId);
+//		}).sorted((t1, t2) -> {
+//			return t1.getTimestamp().compareTo(t2.getTimestamp());
+//		}).toList();
+//	}
 
 //	@PostMapping("/process")
 //	public List<Transaction> updatePayment(@RequestBody PaymentProcessRequest request) {
