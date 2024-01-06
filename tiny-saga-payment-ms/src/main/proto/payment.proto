@@ -24,19 +24,19 @@ message PaymentRequest {
 }
 
 enum OrderStatus {
-  INITIATED = 1;
-  ORDER_PlACED = 2;
-  ORDER_DELIEVERED = 3;
-  ORDER_FAIL = 4;
+  INITIATED = 0;
+  ORDER_PlACED = 1;
+  ORDER_DELIEVERED = 2;
+  ORDER_FAIL = 3;
 }
 
 enum PaymentProcessType {
-  PAY = 1;
-  REFUND = 2;
+  PAY = 0;
+  REFUND = 1;
 }
 
 enum PaymentType {
-  WALLET = 1;
+  WALLET = 0;
 }
 
 message PaymentResponse {

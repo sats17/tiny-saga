@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.sats17.payment.config.Enums.PaymentProcess;
 import com.github.sats17.payment.entity.Transaction;
 import com.github.sats17.payment.entity.TransactionRepository;
 import com.github.sats17.payment.model.v2.PaymentProcessRequest;
@@ -53,17 +52,17 @@ public class PyamentApiController {
 		}).toList();
 	}
 
-	@PostMapping("/process")
-	public List<Transaction> updatePayment(@RequestBody PaymentProcessRequest request) {
-		AppUtils.printLog("Request recived for payment process");
-		AppUtils.printLog("Request body => "+request.toString());
-		if(request.getPaymentProcess().equals(PaymentProcess.PAY)) {
-			paymentService.performPayment(request);
-		} else if(request.getPaymentProcess().equals(PaymentProcess.REFUND)) {
-			paymentService.performRefund(request);
-		}
-		
-		return null;
-	}
+//	@PostMapping("/process")
+//	public List<Transaction> updatePayment(@RequestBody PaymentProcessRequest request) {
+//		AppUtils.printLog("Request recived for payment process");
+//		AppUtils.printLog("Request body => "+request.toString());
+//		if(request.getPaymentProcess().equals(PaymentProcess.PAY)) {
+//			paymentService.performPayment(request);
+//		} else if(request.getPaymentProcess().equals(PaymentProcess.REFUND)) {
+//			paymentService.performRefund(request);
+//		}
+//		
+//		return null;
+//	}
 
 }
