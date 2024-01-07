@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.sats17.payment.entity.Transaction;
 import com.github.sats17.payment.entity.TransactionRepository;
 import com.github.sats17.payment.model.v2.PaymentProcessRequest;
-import com.github.sats17.payment.service.PaymentService;
 import com.github.sats17.payment.util.AppUtils;
 
 
@@ -25,8 +24,8 @@ public class PyamentApiController {
 	@Autowired
 	TransactionRepository transactionRepository;
 	
-	@Autowired
-	PaymentService paymentService;
+//	@Autowired
+//	PaymentService paymentService;
 
 	@GetMapping("/dev/healthcheck")
 	public String getHealthCheck() {
@@ -34,35 +33,22 @@ public class PyamentApiController {
 		return "ok ok health from transaction";
 	}
 
-//	@GetMapping("/dev/transactions")
-//	public List<Transaction> getAllTransactions() {
-//		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
-//		Iterable<Transaction> transactionIterable = transactionRepository.findAll();
-//		return StreamSupport.stream(transactionIterable.spliterator(), false).toList();
-//	}
+	@GetMapping("/dev/transactions")
+	public List<Transaction> getAllTransactions() {
+		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
+		Iterable<Transaction> transactionIterable = transactionRepository.findAll();
+		return StreamSupport.stream(transactionIterable.spliterator(), false).toList();
+	}
 
-//	@GetMapping("/dev/transactions/order")
-//	public List<Transaction> getAllTransactionsForOrder(@RequestParam String orderId) {
-//		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
-//		Iterable<Transaction> transactionIterable = transactionRepository.findAll();
-//		return StreamSupport.stream(transactionIterable.spliterator(), false).filter(transaction -> {
-//			return transaction.getOrderId().equals(orderId);
-//		}).sorted((t1, t2) -> {
-//			return t1.getTimestamp().compareTo(t2.getTimestamp());
-//		}).toList();
-//	}
-
-//	@PostMapping("/process")
-//	public List<Transaction> updatePayment(@RequestBody PaymentProcessRequest request) {
-//		AppUtils.printLog("Request recived for payment process");
-//		AppUtils.printLog("Request body => "+request.toString());
-//		if(request.getPaymentProcess().equals(PaymentProcess.PAY)) {
-//			paymentService.performPayment(request);
-//		} else if(request.getPaymentProcess().equals(PaymentProcess.REFUND)) {
-//			paymentService.performRefund(request);
-//		}
-//		
-//		return null;
-//	}
+	@GetMapping("/dev/transactions/order")
+	public List<Transaction> getAllTransactionsForOrder(@RequestParam String orderId) {
+		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
+		Iterable<Transaction> transactionIterable = transactionRepository.findAll();
+		return StreamSupport.stream(transactionIterable.spliterator(), false).filter(transaction -> {
+			return transaction.getOrderId().equals(orderId);
+		}).sorted((t1, t2) -> {
+			return t1.getTimestamp().compareTo(t2.getTimestamp());
+		}).toList();
+	}
 
 }

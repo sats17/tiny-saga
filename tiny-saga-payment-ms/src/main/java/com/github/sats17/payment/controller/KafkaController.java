@@ -51,33 +51,33 @@ public class KafkaController {
 	@Value(value = "${spring.kafka.group_id}")
 	private String groupId;
 
-//	@KafkaListener(topics = { "order-topic" }, groupId = "${spring.kafka.group_id}")
-//	public void consume(String event) throws InterruptedException {
-//		KafkaEventRequest eventObj = null;
-//		try {
-//			eventObj = mapper.readValue(event, KafkaEventRequest.class);
-//			AppUtils.printLog("Event recevied = " + eventObj.getEventName());
-//			switch (eventObj.getEventName()) {
-//			case ORDER_INITIATED:
-//				Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process",
-//						PaymentStatus.PAYMENT_INITIATED, TransactionType.WITHDRAWAL);
-//				updateTransaction(transaction);
-//				processOrderInitatedEvent(eventObj);
-//				break;
-//			case INVENTORY_INSUFFICIENT:
-//				processInventoryInsufficientEvent(eventObj);
-//				break;
-//			default:
-//				AppUtils.printLog("Event not supported");
-//				break;
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			System.out.println(e);
-//			System.out.println("Something went wrong in event => " + event);
-//			System.out.println(e.getMessage());
-//		}
-//	}
+	@KafkaListener(topics = { "order-topic" }, groupId = "${spring.kafka.group_id}")
+	public void consume(String event) throws InterruptedException {
+		KafkaEventRequest eventObj = null;
+		try {
+			eventObj = mapper.readValue(event, KafkaEventRequest.class);
+			AppUtils.printLog("Event recevied = " + eventObj.getEventName());
+			switch (eventObj.getEventName()) {
+			case ORDER_INITIATED:
+				Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process",
+						PaymentStatus.PAYMENT_INITIATED, TransactionType.WITHDRAWAL);
+				updateTransaction(transaction);
+				processOrderInitatedEvent(eventObj);
+				break;
+			case INVENTORY_INSUFFICIENT:
+				processInventoryInsufficientEvent(eventObj);
+				break;
+			default:
+				AppUtils.printLog("Event not supported");
+				break;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e);
+			System.out.println("Something went wrong in event => " + event);
+			System.out.println(e.getMessage());
+		}
+	}
 
 	private void processOrderInitatedEvent(KafkaEventRequest event) {
 		AppUtils.printLog("Processing order intiated event");
