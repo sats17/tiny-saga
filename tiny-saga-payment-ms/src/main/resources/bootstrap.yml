@@ -12,3 +12,5 @@ walletMs:
   host: http://localhost:8086
   basePath: /v1/api/wallet
   
+isChoreographyEnabled: false
+  

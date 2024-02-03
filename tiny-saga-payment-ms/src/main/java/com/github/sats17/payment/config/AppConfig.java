@@ -1,5 +1,7 @@
 package com.github.sats17.payment.config;
 
+import java.net.http.HttpClient;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -19,5 +21,11 @@ public class AppConfig {
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
+	
+    @Bean
+    public HttpClient httpClient() {
+        // You can customize the HttpClient configuration as needed
+        return HttpClient.newHttpClient();
+    }
 
 }

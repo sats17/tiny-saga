@@ -5,12 +5,16 @@ import java.net.URISyntaxException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -51,32 +55,50 @@ public class KafkaController {
 	@Value(value = "${spring.kafka.group_id}")
 	private String groupId;
 
-	@KafkaListener(topics = { "order-topic" }, groupId = "${spring.kafka.group_id}")
-	public void consume(String event) throws InterruptedException {
-		KafkaEventRequest eventObj = null;
-		try {
-			eventObj = mapper.readValue(event, KafkaEventRequest.class);
-			AppUtils.printLog("Event recevied = " + eventObj.getEventName());
-			switch (eventObj.getEventName()) {
-			case ORDER_INITIATED:
-				Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process",
-						PaymentStatus.PAYMENT_INITIATED, TransactionType.WITHDRAWAL);
-				updateTransaction(transaction);
-				processOrderInitatedEvent(eventObj);
-				break;
-			case INVENTORY_INSUFFICIENT:
-				processInventoryInsufficientEvent(eventObj);
-				break;
-			default:
-				AppUtils.printLog("Event not supported");
-				break;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println(e);
-			System.out.println("Something went wrong in event => " + event);
-			System.out.println(e.getMessage());
+	@Value("${isChoreographyEnabled:false}")
+	private boolean kafkaListenerEnabled;
+
+	@Autowired
+	private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+
+	@EventListener
+	public void onStarted(ApplicationStartedEvent event) {
+		if (kafkaListenerEnabled) {
+			MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry
+					.getListenerContainer("myListener");
+			listenerContainer.start();
 		}
+	}
+
+	@KafkaListener(topics = { "order-topic" }, autoStartup = "false", groupId = "${spring.kafka.group_id}")
+	public void consume(String event) throws InterruptedException {
+		if (!kafkaListenerEnabled) {
+			KafkaEventRequest eventObj = null;
+			try {
+				eventObj = mapper.readValue(event, KafkaEventRequest.class);
+				AppUtils.printLog("Event recevied = " + eventObj.getEventName());
+				switch (eventObj.getEventName()) {
+				case ORDER_INITIATED:
+					Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process",
+							PaymentStatus.PAYMENT_INITIATED, TransactionType.WITHDRAWAL);
+					updateTransaction(transaction);
+					processOrderInitatedEvent(eventObj);
+					break;
+				case INVENTORY_INSUFFICIENT:
+					processInventoryInsufficientEvent(eventObj);
+					break;
+				default:
+					AppUtils.printLog("Event not supported");
+					break;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.out.println(e);
+				System.out.println("Something went wrong in event => " + event);
+				System.out.println(e.getMessage());
+			}
+		}
+
 	}
 
 	private void processOrderInitatedEvent(KafkaEventRequest event) {
