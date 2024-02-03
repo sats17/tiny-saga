@@ -12,20 +12,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.sats17.payment.entity.Transaction;
 import com.github.sats17.payment.entity.TransactionRepository;
+import com.github.sats17.payment.exception.WalletException;
 import com.github.sats17.payment.model.v2.PaymentProcessRequest;
+import com.github.sats17.payment.service.PaymentService;
 import com.github.sats17.payment.util.AppUtils;
-
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
+@RestController
 @RequestMapping("/v2/api/payment")
 public class PyamentApiController {
 
 	@Autowired
 	TransactionRepository transactionRepository;
 	
-//	@Autowired
-//	PaymentService paymentService;
+	@Autowired
+	PaymentService paymentService;
 
 	@GetMapping("/dev/healthcheck")
 	public String getHealthCheck() {
@@ -52,7 +54,14 @@ public class PyamentApiController {
 	}
 
 	@PostMapping("/order/pay")
-	public Object processPaymentForOrderPay(@RequestBody PaymentProcessRequest request) {
+	public Object processPaymentForOrderPay(@org.springframework.web.bind.annotation.RequestBody PaymentProcessRequest request) {
+		System.out.println(request.toString());
+		try {
+			paymentService.processPayment(request);
+		} catch (WalletException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 	

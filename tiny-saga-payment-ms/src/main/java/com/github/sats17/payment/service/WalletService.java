@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.sats17.payment.exception.WalletException;
 import com.github.sats17.payment.model.WalletMsResponse;
+import com.github.sats17.payment.util.AppUtils;
 
 @Service
 public class WalletService {
@@ -21,24 +23,24 @@ public class WalletService {
 	@Autowired
 	ObjectMapper mapper;
 
-	public WalletMsResponse debitAmount(String url, String userId, Long amount) throws InterruptedException, IOException {
-		URI uri = URI.create(url + "/?userId=" + userId + "/amount=" + amount);
-		HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
+	public WalletMsResponse debitAmount(String url, String userId, Long amount) throws WalletException {
+		URI uri = URI.create(url + "/debit?userId=" + userId + "&amount=" + amount);
+		HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(HttpRequest.BodyPublishers.noBody()).build();
+		AppUtils.printLog("Wallet MS Request URL: " + uri);
 		HttpResponse<String> response;
 		try {
 			response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-			System.out.println("HTTP GET Request URL: " + uri);
-			System.out.println("HTTP GET Response Code: " + response.statusCode());
-			System.out.println("HTTP GET Response Body: " + response.body());
+			AppUtils.printLog("Wallet MS debit amount Response Code: " + response.statusCode());
+			AppUtils.printLog("Wallet MS debit amount response Body: " + response.body());
 			return mapper.readValue(response.body(), WalletMsResponse.class);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw e;
+			throw new WalletException(e.getMessage());
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			throw e;
+			throw new WalletException(e.getMessage());
 		}
 	}
 
