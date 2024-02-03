@@ -51,4 +51,9 @@ public class PyamentApiController {
 		}).toList();
 	}
 
+	@PostMapping("/order/pay")
+	public Object processPaymentForOrderPay(@RequestBody PaymentProcessRequest request) {
+		return null;
+	}
+	
 }
