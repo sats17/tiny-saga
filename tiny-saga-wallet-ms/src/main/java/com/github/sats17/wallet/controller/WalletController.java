@@ -92,7 +92,7 @@ public class WalletController {
 		if (walletOptional.isPresent()) {
 			Wallet wallet = walletOptional.get();
 			Double currentBalance = wallet.getAmount();
-			// TODO: Fix this transaction atomic.
+			// TODO: Fix this transaction to be atomic.
 			wallet.setAmount(currentBalance + amount);
 			Wallet updatedWallet = walletRepository.save(wallet);
 			Response response = new Response(20000, updatedWallet.getAmount(), "Amount debited successfully.");

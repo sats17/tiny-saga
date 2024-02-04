@@ -30,6 +30,10 @@ public class Enums {
 		WALLET
 	}
 	
+	public enum PaymentProcessType {
+		PAY, REFUND
+	}
+	
 	public enum TransactionType {
 		DEPOSIT, WITHDRAWAL
 	}
