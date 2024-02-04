@@ -22,7 +22,7 @@ public class KafkaController {
 	@Value(value = "${spring.kafka.group_id}")
 	private String groupId;
 	
-	@KafkaListener(topics = { "orchestrator-topic" }, groupId = "${spring.kafka.group_id}")
+	@KafkaListener(topics = { "orchestrator-topic" }, autoStartup = "false", groupId = "${spring.kafka.group_id}")
 	public void consume(String event) throws InterruptedException {
 		KafkaEventRequest eventObj = null;
 		try {

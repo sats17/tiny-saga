@@ -29,4 +29,8 @@ public class AppUtils {
 		String uniqueID = System.currentTimeMillis() + "-" + UUID.randomUUID().toString();
 		return uniqueID;
 	}
+
+	public static String buildUrl(String protocol, String host, String port) {
+		return protocol + "://" + host + ":" + port;
+	}
 }

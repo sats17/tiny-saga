@@ -35,13 +35,14 @@ public class ServiceEndpoint {
 				   });
 	}
 	
-	@SuppressWarnings("deprecation")
-	public Mono<ClientResponse> post(String uriPath, Object body) {
+	public Mono<String> post(String uriPath, String body) {
 		return this.webClient
 				   .post()
 				   .uri(uriBuilder -> uriBuilder.path(uriPath).build())
 				   .bodyValue(body)
-				   .exchange();
+				   .exchangeToMono(response -> {
+					   return response.bodyToMono(String.class);
+				   });
 	}
 	
 }
