@@ -9,6 +9,8 @@ public class PaymentMsResponse {
 	private int status;
 	private String responseMessage;
 	private String serviceName;
+	
+	
 
 	public int getStatus() {
 		return status;
