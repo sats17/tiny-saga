@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.sats17.payment.entity.Transaction;
 import com.github.sats17.payment.entity.TransactionRepository;
 import com.github.sats17.payment.exception.WalletException;
+import com.github.sats17.payment.model.PaymentMsResponse;
 import com.github.sats17.payment.model.v2.PaymentProcessRequest;
 import com.github.sats17.payment.service.PaymentService;
 import com.github.sats17.payment.util.AppUtils;
@@ -54,10 +57,11 @@ public class PyamentApiController {
 	}
 
 	@PostMapping("/order/pay")
-	public Object processPaymentForOrderPay(@org.springframework.web.bind.annotation.RequestBody PaymentProcessRequest request) {
+	public ResponseEntity<PaymentMsResponse> processPaymentForOrderPay(@org.springframework.web.bind.annotation.RequestBody PaymentProcessRequest request) {
 		System.out.println(request.toString());
 		try {
-			paymentService.processPayment(request);
+			PaymentMsResponse response = paymentService.processPayment(request);
+			return ResponseEntity.status(HttpStatus.OK).body(response);
 		} catch (WalletException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

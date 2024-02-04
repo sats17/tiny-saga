@@ -1,6 +1,7 @@
 package com.github.sats17.payment.service;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +11,9 @@ import com.github.sats17.payment.config.Enums.PaymentFailReason;
 import com.github.sats17.payment.config.Enums.PaymentStatus;
 import com.github.sats17.payment.config.Enums.TransactionType;
 import com.github.sats17.payment.entity.Transaction;
+import com.github.sats17.payment.entity.TransactionRepository;
 import com.github.sats17.payment.exception.WalletException;
+import com.github.sats17.payment.model.KafkaEventRequest;
 import com.github.sats17.payment.model.PaymentMsResponse;
 import com.github.sats17.payment.model.WalletMsResponse;
 import com.github.sats17.payment.model.v2.PaymentProcessRequest;
@@ -28,7 +31,13 @@ public class PaymentService {
 	@Autowired
 	WalletService walletService;
 
-	public Object processPayment(PaymentProcessRequest request) throws WalletException {
+	@Autowired
+	TransactionRepository transactionRepository;
+
+	@Autowired
+	ExecutorService cachedThreadPool;
+
+	public PaymentMsResponse processPayment(PaymentProcessRequest request) throws WalletException {
 
 		WalletMsResponse response = walletService.debitAmount(walletMsHost + walletMsBasePath, request.getUserId(),
 				request.getPrice());
@@ -36,30 +45,54 @@ public class PaymentService {
 			return new PaymentMsResponse(500, "Server error occured from wallet MS, while debiting amount");
 		} else if (response.getStatus() == 20000) {
 			AppUtils.printLog("Amount debited successfully for userId " + request.getUserId());
+			Transaction transaction = buildTransaction(request, "Amount debit is done", PaymentStatus.PAYMENT_DONE,
+					TransactionType.WITHDRAWAL);
+			saveTransactionAsync(transaction);
 			return new PaymentMsResponse(200, "Payment is succesful");
-//			Transaction transaction = buildTransaction(event, "Amount debit is done",
-//					PaymentStatus.PAYMENT_DONE, TransactionType.WITHDRAWAL);
-//			updateTransaction(transaction);
-			//sendPaymentDoneEvent(event);
 		} else if (response.getStatus() == 40001) {
-//			Transaction transaction = buildTransaction(event,
-//					"Payment cannot be proceed, due to insufficient fund", PaymentStatus.PAYMENT_FAILED,
-//					TransactionType.WITHDRAWAL);
-//			updateTransaction(transaction);
+			Transaction transaction = buildTransaction(request, "Payment cannot be proceed, due to insufficient fund",
+					PaymentStatus.PAYMENT_FAILED, TransactionType.WITHDRAWAL);
+			saveTransactionAsync(transaction);
+			AppUtils.printLog(
+					"Payment cannot be proceed, due to insufficient fund. Repsonse -> " + response.toString());
 			return new PaymentMsResponse(400, "Payment cannot be proceed, due to insufficient fund");
-//			AppUtils.printLog(
-//					"Payment cannot be proceed, due to insufficient fund. Repsonse -> " + response.toString());
-//			sendPaymentFailEvent(event, PaymentFailReason.INSUFFICIENT_FUND);
+		} else if (response.getStatus() == 40002) {
+			Transaction transaction = buildTransaction(request,
+					"Payment cannot be proceed, due to user not found in wallet db.", PaymentStatus.PAYMENT_FAILED,
+					TransactionType.WITHDRAWAL);
+			saveTransactionAsync(transaction);
+			AppUtils.printLog("Payment cannot be proceed, due to user not found. Repsonse -> " + response.toString());
+			return new PaymentMsResponse(404, "Payment cannot be process, " + response.getResponseMessage());
 		} else {
+			Transaction transaction = buildTransaction(request, "Payment cannot be proceed",
+					PaymentStatus.PAYMENT_FAILED, TransactionType.WITHDRAWAL);
+			saveTransactionAsync(transaction);
+			AppUtils.printLog(
+					"Server error occured from wallet MS, while debiting amount. Repsonse -> " + response.toString());
 			return new PaymentMsResponse(500, "Server error occured from wallet MS, while debiting amount");
-//			Transaction transaction = buildTransaction(event, "Payment cannot be proceed",
-//					PaymentStatus.PAYMENT_FAILED, TransactionType.WITHDRAWAL);
-//			updateTransaction(transaction);
-//			AppUtils.printLog(
-//					"Invalid repsonse code from wallet MS, response is not matching as per contract. Repsonse -> "
-//							+ response.toString());
-//			sendPaymentFailEvent(event, PaymentFailReason.PAYMENT_SERVER_ERROR);
+
 		}
 	}
 
+	private Transaction buildTransaction(PaymentProcessRequest request, String description, PaymentStatus paymentStatus,
+			TransactionType transactionType) {
+		Transaction transaction = new Transaction();
+		transaction.setOrderId(request.getOrderId());
+		transaction.setAmount(request.getPrice());
+		transaction.setDescription(description);
+		transaction.setUserId(request.getUserId());
+		transaction.setTimestamp(AppUtils.generateEpochTimestamp());
+		transaction.setCurrency("INR");
+		transaction.setTransactionId(AppUtils.generateUniqueID());
+		transaction.setPaymentStatus(paymentStatus);
+		transaction.setTransactionType(transactionType);
+
+		return transaction;
+	}
+
+	private void saveTransactionAsync(Transaction transaction) {
+		cachedThreadPool.submit(() -> {
+			transactionRepository.save(transaction);
+		});
+	}
 }
