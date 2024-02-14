@@ -301,6 +301,7 @@ SMS That inventory insufficient.
 ## Kafka design
 * How kafka fits in orchestration pattern ? -> Any request coming to orchestration ms, will send it through kafka. So, it can be async and it will persist the message in broker
 if orchestration ms is down.
+* If using kafka in docker then use port 29092, If kafka installed in windows then use port 9092
   
 
 ## Questions and Considerations

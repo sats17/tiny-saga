@@ -58,21 +58,22 @@ public class KafkaController {
 	@Value("${isChoreographyEnabled:false}")
 	private boolean kafkaListenerEnabled;
 
-	@Autowired
-	private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+//	@Autowired
+//	private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+//
+//	@EventListener
+//	public void onStarted(ApplicationStartedEvent event) {
+//		if (kafkaListenerEnabled) {
+//			MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry
+//					.getListenerContainer("myListener");
+//			listenerContainer.start();
+//		}
+//	}
 
-	@EventListener
-	public void onStarted(ApplicationStartedEvent event) {
-		if (kafkaListenerEnabled) {
-			MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry
-					.getListenerContainer("myListener");
-			listenerContainer.start();
-		}
-	}
-
+	// If want to enable kafka then make autoStartup as true and kafkaListenerEnabled should be true.
 	@KafkaListener(topics = { "order-topic" }, autoStartup = "false", groupId = "${spring.kafka.group_id}")
 	public void consume(String event) throws InterruptedException {
-		if (!kafkaListenerEnabled) {
+		if (kafkaListenerEnabled) {
 			KafkaEventRequest eventObj = null;
 			try {
 				eventObj = mapper.readValue(event, KafkaEventRequest.class);
