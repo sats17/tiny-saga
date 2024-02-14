@@ -5,7 +5,7 @@ springdoc.api-docs.path: /payment-docs
 
 spring:
   kafka:
-    bootstrap-servers: localhost:29092
+    bootstrap-servers: localhost:9092 # For docker use port 29092, For windows cluster use port 9092
     group_id: payment-ms
 
 walletMs:
