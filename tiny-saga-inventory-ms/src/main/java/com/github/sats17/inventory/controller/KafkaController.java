@@ -32,7 +32,7 @@ public class KafkaController {
 	@Autowired
 	InventoryRepository inventoryRepository;
 
-	@KafkaListener(topics = { "order-topic" }, groupId = "${spring.kafka.group_id}")
+	@KafkaListener(topics = { "order-topic" }, autoStartup = "false", groupId = "${spring.kafka.group_id}")
 	public void consume(String event) throws InterruptedException {
 		KafkaEventRequest eventObj = null;
 		try {
