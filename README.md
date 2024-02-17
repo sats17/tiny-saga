@@ -6,13 +6,14 @@ Proof of concept implementation of microservices saga pattern.
 ## To See Technical Diagrams Check below link:
 ### https://sats17.github.io/tiny-saga/
 
+<hr/>
 
-## Services
+# Services
 
-### API Gateway
+### 1) API Gateway
 The API gateway acts as a single entry point for client requests, providing load balancing, authentication, and rate limiting.
 
-### Order Microservice (Order MS)
+### 2) Order Microservice (Order MS)
 This microservice is responsible for managing orders, including their creation, updating, and retrieval. It also handles order status updates, tracking information, and order history.
 
 Key operations:
@@ -21,7 +22,7 @@ Key operations:
 * Get order details
 * Update order status
 
-### Payment Microservice (Payment MS)
+### 3) Payment Microservice (Payment MS)
 The Payment MS is responsible for processing payments, including traditional payments made using a wallet.
 
 Key operations:
@@ -29,7 +30,7 @@ Key operations:
 * Verify wallet balance
 * Send notification to user about payment.
 
-### Wallet Microservice (Wallet MS)
+### 4) Wallet Microservice (Wallet MS)
 This microservice manages user wallets, including checking the available balance and updating the wallet upon successful payment.
 
 Key operations:
@@ -46,7 +47,9 @@ Key operations:
 ### Notification Microservice
 This microservice is responsible for sending notification to users
 
-## Database
+<hr/>
+
+# Database
 
 ### 1) Order DB
 * OrderId: A unique identifier for the order (Primary Key).
@@ -80,6 +83,7 @@ This microservice is responsible for sending notification to users
 * Timestamp: The date and time when the transaction occurred.
 * Description: A brief description or note about the transaction (optional).
 
+<hr/>
 
 ## User Journey
 1) User clicks on order with selected payment mode -> Backend call will be trigger, it will take payment and place order (edge cases of insufficient fund or inventory insufficient are async flow)
@@ -88,6 +92,7 @@ This microservice is responsible for sending notification to users
 Payment page~~
 ~~2) User clicks on payment -> Backend /api/payment -> API will trigger and do payment from wallet. Validation if there is no amount available.~~
 
+<hr/>
 
 ## API Journeys (Choreography Pattern)
 
@@ -119,9 +124,6 @@ Payment page~~
 * The Order microservice listens for "InventoryInsufficient" event, the Order microservice will update order with Payment Refund initiated. And Order microservice should notified via
 SMS That inventory insufficient.
 * The Order microservice listens for the "RefundSucceeded" and "RefundFailed" events. If it receives a "RefundSucceeded" event, it updates the order status to "Failed" with a reason indicating that the inventory was insufficient, and the refund was successful. And it should notified via SMS that refund is done. If it receives a "RefundFailed" event, it updates the order status to "Failed" and stores the reason for the failure (inventory insufficiency and refund-related issues). Refund failed is critical and it need to check.
-
-
-
 
 
 
@@ -283,6 +285,8 @@ SMS That inventory insufficient.
 
 ### End of choreography pattern
 
+<hr/>
+
 ## API Journeys (Orchestration Pattern)
 
 ### 1) Place a order with wallet payment mode
@@ -303,7 +307,8 @@ SMS That inventory insufficient.
 if orchestration ms is down.
 * orchestrator-topic is used in orchestrator pattern. Topic will only be consume by orchestrator ms.
 * If using kafka in docker then use port 29092, If kafka installed in windows then use port 9092
-  
+
+<hr/>
 
 ## Questions and Considerations
 * What specific information will be included in the event published to Kafka by the Payment MS? -> Check events mentioned above.
