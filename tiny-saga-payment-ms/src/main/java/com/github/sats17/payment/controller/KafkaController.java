@@ -70,34 +70,34 @@ public class KafkaController {
 //		}
 //	}
 
-	// If want to enable kafka then make autoStartup as true and kafkaListenerEnabled should be true.
+	// If want to enable kafka then make autoStartup as true and
+	// kafkaListenerEnabled should be true.
 	@KafkaListener(topics = { "order-topic" }, autoStartup = "false", groupId = "${spring.kafka.group_id}")
 	public void consume(String event) throws InterruptedException {
-		if (kafkaListenerEnabled) {
-			KafkaEventRequest eventObj = null;
-			try {
-				eventObj = mapper.readValue(event, KafkaEventRequest.class);
-				AppUtils.printLog("Event recevied = " + eventObj.getEventName());
-				switch (eventObj.getEventName()) {
-				case ORDER_INITIATED:
-					Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process",
-							PaymentStatus.PAYMENT_INITIATED, TransactionType.WITHDRAWAL);
-					updateTransaction(transaction);
-					processOrderInitatedEvent(eventObj);
-					break;
-				case INVENTORY_INSUFFICIENT:
-					processInventoryInsufficientEvent(eventObj);
-					break;
-				default:
-					AppUtils.printLog("Event not supported");
-					break;
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.println(e);
-				System.out.println("Something went wrong in event => " + event);
-				System.out.println(e.getMessage());
+		System.out.println(groupId);
+		KafkaEventRequest eventObj = null;
+		try {
+			eventObj = mapper.readValue(event, KafkaEventRequest.class);
+			AppUtils.printLog("Event recevied = " + eventObj.getEventName());
+			switch (eventObj.getEventName()) {
+			case ORDER_INITIATED:
+				Transaction transaction = buildTransaction(eventObj, "Initiated amount debit process",
+						PaymentStatus.PAYMENT_INITIATED, TransactionType.WITHDRAWAL);
+				updateTransaction(transaction);
+				processOrderInitatedEvent(eventObj);
+				break;
+			case INVENTORY_INSUFFICIENT:
+				processInventoryInsufficientEvent(eventObj);
+				break;
+			default:
+				AppUtils.printLog("Event not supported");
+				break;
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e);
+			System.out.println("Something went wrong in event => " + event);
+			System.out.println(e.getMessage());
 		}
 
 	}
