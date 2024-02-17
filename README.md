@@ -37,7 +37,7 @@ Key operations:
 * Get wallet balance
 * Update wallet balance
 
-### Inventory Microservice (Inventory MS)
+### 5) Inventory Microservice (Inventory MS)
 The Inventory MS manages stock levels and product availability.
 
 Key operations:
