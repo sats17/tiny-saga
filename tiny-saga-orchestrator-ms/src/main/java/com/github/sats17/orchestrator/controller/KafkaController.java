@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sats17.orchestrator.model.KafkaEventRequest;
+import com.github.sats17.orchestrator.service.OrderService;
 import com.github.sats17.orchestrator.utils.AppUtils;
 
 @Component
@@ -22,7 +23,10 @@ public class KafkaController {
 	@Value(value = "${spring.kafka.group_id}")
 	private String groupId;
 	
-	@KafkaListener(topics = { "orchestrator-topic" }, autoStartup = "false", groupId = "${spring.kafka.group_id}")
+	@Autowired
+	OrderService orderService;
+	
+	@KafkaListener(topics = { "orchestrator-topic" }, groupId = "${spring.kafka.group_id}")
 	public void consume(String event) throws InterruptedException {
 		KafkaEventRequest eventObj = null;
 		try {
@@ -30,7 +34,7 @@ public class KafkaController {
 			AppUtils.printLog("Event recevied = "+eventObj.getEventName());
 			switch (eventObj.getEventName()) {
 			case ORDER_INITIATED:
-				AppUtils.printLog("ORDER_INITIATED Event not supported");
+				orderService.processOrderInitialization(eventObj);
 				break;
 			default:
 				AppUtils.printLog("UNKNOWN Event not supported");

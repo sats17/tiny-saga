@@ -1,5 +1,6 @@
 package com.github.sats17.orchestrator.utils;
 
+import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +31,14 @@ public class AppUtils {
 		return uniqueID;
 	}
 
-	public static String buildUrl(String protocol, String host, String port) {
-		return protocol + "://" + host + ":" + port;
+	public static String buildUrl(String protocol, String host, String port, String path) {
+		return protocol + "://" + host + ":" + port + path;
+	}
+
+	public static String replacePathParams(String path, Map<String, String> params) {
+		for (Map.Entry<String, String> entry : params.entrySet()) {
+			path = path.replace("{" + entry.getKey() + "}", entry.getValue());
+		}
+		return path;
 	}
 }

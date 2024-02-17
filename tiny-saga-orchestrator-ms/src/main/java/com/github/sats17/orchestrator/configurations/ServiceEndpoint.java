@@ -1,5 +1,6 @@
 package com.github.sats17.orchestrator.configurations;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -40,7 +41,20 @@ public class ServiceEndpoint {
 		return this.webClient
 				   .post()
 				   .uri(uriBuilder -> uriBuilder.path(uriPath).build())
+				   .contentType(MediaType.APPLICATION_JSON)
 				   .bodyValue(body)
+				   .accept(MediaType.APPLICATION_JSON)
+				   .retrieve();
+				   
+	}
+	
+	public ResponseSpec put(String uriPath, String body) {
+		return this.webClient
+				   .put()
+				   .uri(uriBuilder -> uriBuilder.path(uriPath).build())
+				   .contentType(MediaType.APPLICATION_JSON)
+				   .bodyValue(body)
+				   .accept(MediaType.APPLICATION_JSON)
 				   .retrieve();
 				   
 	}
