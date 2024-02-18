@@ -1,0 +1,117 @@
+openapi: 3.0.3
+info:
+  title: Inventory API
+  version: 1.0.0
+paths:
+  /v2/api/inventory/dev/healthcheck:
+    get:
+      summary: Get Health Check. This API Used in Orchestrator saga pattern.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+                   "status": 200,
+                   "responseMessage": "Inventory server and Inventory DB is up and running"
+                 }
+  /v2/api/inventory/reserve/product/{productId}:
+    put:
+      summary: >-
+        Reserve product from inventory. This API Used in Orchestrator saga
+        pattern.
+      description: Update the reservation quantity for a specific product in the inventory.
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product to update reservation
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  example: 12
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+                   "status": 200,
+                   "responseMessage": "Inventory updated succesfully"
+                 }
+        '404':
+          description: Data not found
+          content:
+            application/json:
+              example: |
+                {
+                  "status": 404,
+                  "responseMessage": "Product not found"
+                }
+        '500':
+          description: Server error
+          content:
+            application/json:
+              example: |
+                {
+                  "status": 500,
+                  "responseMessage": "Inventory Server Error."
+                }
+  /v2/api/inventory/dev/products:
+    put:
+      summary: Update product quantity by productId in inventory. This API used for development/debugging purpose.
+      parameters:
+        - name: productId
+          in: query
+          description: ID of the product to update
+          required: true
+          schema:
+            type: string
+        - name: productQuantity
+          in: query
+          description: Quantity to add to the product
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Inventory'
+    get:
+      summary: Get all products from inventory. This API used for development/debugging purpose.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Inventory'
+components:
+  schemas:
+    Inventory:
+      type: object
+      properties:
+        productId:
+          type: string
+        productQuantity:
+          type: integer
+      required:
+        - productId
+        - productQuantity

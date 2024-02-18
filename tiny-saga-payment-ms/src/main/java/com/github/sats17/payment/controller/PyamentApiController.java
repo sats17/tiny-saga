@@ -20,8 +20,6 @@ import com.github.sats17.payment.model.v2.PaymentProcessRequest;
 import com.github.sats17.payment.service.PaymentService;
 import com.github.sats17.payment.util.AppUtils;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
-
 @RestController
 @RequestMapping("/v2/api/payment")
 public class PyamentApiController {
@@ -33,9 +31,9 @@ public class PyamentApiController {
 	PaymentService paymentService;
 
 	@GetMapping("/dev/healthcheck")
-	public String getHealthCheck() {
+	public ResponseEntity<PaymentMsResponse> getHealthCheck() {
 		AppUtils.printLog("Data present in transaction DB " + transactionRepository.count());
-		return "ok ok health from transaction";
+		return ResponseEntity.status(HttpStatus.OK).body(new PaymentMsResponse(200, "Payment Server and transaction DB is up and running."));
 	}
 
 	@GetMapping("/dev/transactions")

@@ -5,14 +5,15 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.sats17.orchestrator.OrchestratorException;
 import com.github.sats17.orchestrator.configurations.ConfigProperties;
 import com.github.sats17.orchestrator.configurations.ServiceEndpoint;
 import com.github.sats17.orchestrator.exception.InternalServerException;
+import com.github.sats17.orchestrator.exception.ServiceException;
 import com.github.sats17.orchestrator.model.InventoryMsResponse;
 import com.github.sats17.orchestrator.model.KafkaEventRequest;
 import com.github.sats17.orchestrator.model.PaymentMsRequest;
@@ -43,9 +44,10 @@ public class OrderService {
 			if (paymentMsResponse.getStatus() == 200) {
 				return reserveInventory(request);
 			}
-			return reserveInventory(request);
+			return Mono.error(new RuntimeException("Error occured from payment MS"));
 		});
-		// Subscribe invoke payment ms, and inventory ms reactive chain also based on response.
+		// Subscribe method invoke payment ms mono as well as all mono/flux chain that
+		// present inside flatmap.
 		paymentMono.subscribe();
 	}
 
@@ -62,18 +64,10 @@ public class OrderService {
 			throw new InternalServerException(e.getMessage());
 		}
 		ResponseSpec spec = paymentConfig.post(configProperties.getPayment().get("orderPayPath"), requestString);
-		return spec.onStatus(httpStatus -> httpStatus.is4xxClientError(), clientResponse -> {
-			return clientResponse.bodyToMono(String.class).flatMap(body -> {
-				try {
-					PaymentMsResponse resp = mapper.readValue(body, PaymentMsResponse.class);
-					return Mono.error(new OrchestratorException(resp.getServiceName(),
-							clientResponse.statusCode().value(), resp.getResponseMessage()));
-				} catch (Exception e) {
-					return Mono.error(new OrchestratorException("payment ms", clientResponse.statusCode().value(),
-							"Invalid resposne body received from payment ms for 4XX errors"));
-				}
-			});
-		}).bodyToMono(PaymentMsResponse.class);
+		return spec
+				.onStatus(httpStatus -> httpStatus.is4xxClientError(),
+						  clientResponse -> handle4XXError(clientResponse, request, "paymentMs"))
+				.bodyToMono(PaymentMsResponse.class);
 	}
 
 	private Mono<InventoryMsResponse> reserveInventory(KafkaEventRequest request) {
@@ -96,14 +90,25 @@ public class OrderService {
 			return clientResponse.bodyToMono(String.class).flatMap(body -> {
 				try {
 					InventoryMsResponse resp = mapper.readValue(body, InventoryMsResponse.class);
-					return Mono.error(new OrchestratorException(resp.getServiceName(),
+					return Mono.error(new ServiceException(resp.getServiceName(),
 							clientResponse.statusCode().value(), resp.getResponseMessage()));
 				} catch (Exception e) {
-					return Mono.error(new OrchestratorException("payment ms", clientResponse.statusCode().value(),
+					return Mono.error(new ServiceException("payment ms", clientResponse.statusCode().value(),
 							"Invalid resposne body received from payment ms for 4XX errors"));
 				}
 			});
 		}).bodyToMono(InventoryMsResponse.class);
+	}
+
+	private Mono<ServiceException> handle4XXError(ClientResponse clientResponse, KafkaEventRequest request,
+			String serviceName) {
+		return clientResponse.bodyToMono(String.class).flatMap(body -> {
+			AppUtils.printLog("4XX error occured from " + serviceName);
+			AppUtils.printLog("Body = " + body);
+			// TODO: We need to think what we will do in such scenario ?
+			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+		});
+
 	}
 
 }
