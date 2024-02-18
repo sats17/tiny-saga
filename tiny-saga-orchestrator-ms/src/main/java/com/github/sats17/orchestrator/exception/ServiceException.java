@@ -1,6 +1,6 @@
-package com.github.sats17.orchestrator;
+package com.github.sats17.orchestrator.exception;
 
-public class OrchestratorException extends RuntimeException {
+public class ServiceException extends RuntimeException {
 
 	/**
 	 * 
@@ -11,7 +11,7 @@ public class OrchestratorException extends RuntimeException {
 	private Integer statusCode;
 	private String message;
 
-	public OrchestratorException(String subService, Integer statusCode, String message) {
+	public ServiceException(String subService, Integer statusCode, String message) {
 		super();
 		this.subService = subService;
 		this.statusCode = statusCode;
