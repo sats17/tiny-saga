@@ -6,5 +6,5 @@ Proof of concept implementation of microservices saga pattern.
 ## To See Technical Diagrams Check below link:
 ### https://sats17.github.io/tiny-saga/
 <hr/>
-## For documentation [click here](https://github.com/sats17/tiny-saga/wiki)
+## For documentation go to -> https://github.com/sats17/tiny-saga/wiki
 
