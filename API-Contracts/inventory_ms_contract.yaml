@@ -44,6 +44,9 @@ paths:
           description: OK
           content:
             application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
               example: |
                 {
                    "status": 200,
@@ -53,6 +56,9 @@ paths:
           description: Data not found
           content:
             application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
               example: |
                 {
                   "status": 404,
@@ -62,6 +68,9 @@ paths:
           description: Server error
           content:
             application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
               example: |
                 {
                   "status": 500,
@@ -115,3 +124,13 @@ components:
       required:
         - productId
         - productQuantity
+    Response:
+      type: object
+      properties:
+        status:
+          type: integer
+        responseMessage:
+          type: string
+      required:
+        - status
+        - responseMessage
