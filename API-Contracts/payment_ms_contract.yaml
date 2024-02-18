@@ -78,6 +78,9 @@ paths:
           description: OK
           content:
             application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
               example: |
                {
                   "status": 200,
@@ -87,6 +90,9 @@ paths:
           description: Authorization error
           content:
             application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
               example: |
                 {
                   "status": 400,
@@ -96,6 +102,9 @@ paths:
           description: Authorization error
           content:
             application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
               example: |
                 {
                   "status": 401,
@@ -105,6 +114,9 @@ paths:
           description: Authorization error
           content:
             application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
               example: |
                 {
                   "status": 404,
@@ -114,6 +126,9 @@ paths:
           description: Server error
           content:
             application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
               example: |
                 {
                   "status": 500,
@@ -163,3 +178,13 @@ components:
           type: integer
         paymentFailReason:
           type: string
+    Response:
+      type: object
+      properties:
+        status:
+          type: integer
+        responseMessage:
+          type: string
+      required:
+        - status
+        - responseMessage

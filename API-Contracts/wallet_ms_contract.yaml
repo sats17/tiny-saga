@@ -1,0 +1,189 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8086
+    description: Generated server url
+paths:
+  /v1/api/wallet/dev/amount:
+    get:
+      tags:
+        - wallet-controller
+      operationId: getAmount
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Response'
+    post:
+      tags:
+        - wallet-controller
+      operationId: postAmount
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Response'
+  /v1/api/wallet/debit:
+    post:
+      tags:
+        - wallet-controller
+      summary: deduct amount from user wallet. API used in both orchestrator and choreography pattern
+      operationId: debitAmount
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Response'
+              example: |
+               {
+                  "status": 20000,
+                  "responseMessage": "Amount debited successfully.",
+                  "amount": 210
+                }
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Response'
+              example: |
+               {
+                  "status": 40002,
+                  "responseMessage": "UserId not present in wallet."
+                }
+        '406':
+          description: NOT_ACCEPTABLE
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Response'
+              example: |
+               {
+                  "status": 40001,
+                  "responseMessage": "Insufficient balance in wallet."
+                }
+  /v1/api/wallet/credit:
+    post:
+      tags:
+        - wallet-controller
+      operationId: creditAmount
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Response'
+              example: |
+               {
+                  "status": 20000,
+                  "responseMessage": "Amount debited successfully.",
+                  "amount": 210
+                }
+        '400':
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Response'
+              example: |
+               {
+                  "status": 40002,
+                  "responseMessage": "UserId not present in wallet."
+                }
+        '406':
+          description: NOT_ACCEPTABLE
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Response'
+              example: |
+               {
+                  "status": 40001,
+                  "responseMessage": "Insufficient balance in wallet."
+                }
+  /v1/api/wallet/dev/wallets:
+    get:
+      tags:
+        - wallet-controller
+      operationId: getUsers
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Wallet'
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        responseMessage:
+          type: string
+        amount:
+          type: number
+          format: double
+    Wallet:
+      type: object
+      properties:
+        userId:
+          type: string
+        amount:
+          type: number
+          format: double
