@@ -5,16 +5,20 @@ info:
 paths:
   /v2/api/payment/dev/healthcheck:
     get:
-      summary: Get Health Check
+      summary: Get Health Check. This API Used in Orchestrator saga pattern.
       responses:
         '200':
           description: OK
           content:
-            text/plain:
-              example: 'ok ok health from transaction'
+            application/json:
+              example: |
+                {
+                   "status": 200,
+                   "responseMessage": "Payment server and Trabsactuib DB is up and running"
+                 }
   /v2/api/payment/dev/transactions:
     get:
-      summary: Get All Transactions
+      summary: Get All Transactions. This API used for development/debugging purpose.
       responses:
         '200':
           description: OK
@@ -37,7 +41,7 @@ paths:
                 ]
   /v2/api/payment/dev/transactions/order:
     get:
-      summary: Get Transactions for Order
+      summary: Get Transactions for given order id. This API used for development/debugging purpose.
       parameters:
         - name: orderId
           in: query
@@ -61,7 +65,8 @@ paths:
                 ]
   /v2/api/payment/order/pay:
     post:
-      summary: Process Payment For Order
+      summary: Process Payment for given Order id.  This API Used in Orchestrator saga
+        pattern.
       requestBody:
         required: true
         content:
@@ -78,6 +83,15 @@ paths:
                   "status": 200,
                   "responseMessage": "Payment processed succesfully"
                 }
+        '400':
+          description: Authorization error
+          content:
+            application/json:
+              example: |
+                {
+                  "status": 400,
+                  "responseMessage": "Payment cannot be proceed, due to insufficient fund"
+                }
         '401':
           description: Authorization error
           content:
@@ -86,6 +100,15 @@ paths:
                 {
                   "status": 401,
                   "responseMessage": "Authorization exception occured"
+                }
+        '404':
+          description: Authorization error
+          content:
+            application/json:
+              example: |
+                {
+                  "status": 404,
+                  "responseMessage": "User not found in backend"
                 }
         '500':
           description: Server error
@@ -101,6 +124,13 @@ components:
   schemas:
     PaymentProcessRequest:
       type: object
+      required: 
+        - correlationId
+        - orderId
+        - userId
+        - orderStatus
+        - paymentProcessType
+        - paymentType
       properties:
         correlationId:
           type: string
