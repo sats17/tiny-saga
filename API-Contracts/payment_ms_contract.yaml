@@ -98,8 +98,8 @@ paths:
                   "status": 400,
                   "responseMessage": "Payment cannot be proceed, due to insufficient fund"
                 }
-        '401':
-          description: Authorization error
+        '422':
+          description: Insufficient fund in wallet
           content:
             application/json:
               schema:
@@ -107,8 +107,8 @@ paths:
                   $ref: '#/components/schemas/Response'
               example: |
                 {
-                  "status": 401,
-                  "responseMessage": "Authorization exception occured"
+                  "status": 422,
+                  "responseMessage": "Insufficient fund in wallet"
                 }
         '404':
           description: Authorization error

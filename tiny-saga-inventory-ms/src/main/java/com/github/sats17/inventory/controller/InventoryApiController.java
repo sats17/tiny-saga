@@ -63,9 +63,9 @@ public class InventoryApiController {
 		Optional<Inventory> inventory = inventoryRepository.findById(productId);
 		if (inventory.isEmpty()) {
 			AppUtils.printLog("No product found in inventory, Check with administrator. ProductId: " + productId);
-			InventoryMsResponse response = new InventoryMsResponse(404,
+	 		InventoryMsResponse response = new InventoryMsResponse(404,
 					"No product found in inventory, Check with administrator. ProductId: " + productId);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
 		} else {
 			int rowsAffected = inventoryRepository.updateProductQuantity(productId, body.getQuantity());
 			if (rowsAffected <= 0) {
@@ -73,7 +73,7 @@ public class InventoryApiController {
 						+ ". Available quantity is " + inventory.get().getProductQuantity());
 				InventoryMsResponse response = new InventoryMsResponse(404,
 						"Quantity is not sufficient for product in inventory.");
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+				return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
 			}
 			AppUtils.printLog("Updated quantity for product with id " + inventory.get().getProductId());
 			InventoryMsResponse response = new InventoryMsResponse(200, "Inventory updated succesfully");

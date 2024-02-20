@@ -52,8 +52,8 @@ paths:
                    "status": 200,
                    "responseMessage": "Inventory updated succesfully"
                  }
-        '404':
-          description: Data not found
+        '422':
+          description: Product not found
           content:
             application/json:
               schema:
@@ -61,8 +61,8 @@ paths:
                   $ref: '#/components/schemas/Response'
               example: |
                 {
-                  "status": 404,
-                  "responseMessage": "Product not found"
+                  "status": 422,
+                  "responseMessage": "Product not found | Inventory is not sufficient"
                 }
         '500':
           description: Server error

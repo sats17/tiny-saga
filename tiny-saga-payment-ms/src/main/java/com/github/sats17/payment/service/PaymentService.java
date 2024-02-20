@@ -1,19 +1,16 @@
 package com.github.sats17.payment.service;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.github.sats17.payment.config.Enums.PaymentFailReason;
 import com.github.sats17.payment.config.Enums.PaymentStatus;
 import com.github.sats17.payment.config.Enums.TransactionType;
 import com.github.sats17.payment.entity.Transaction;
 import com.github.sats17.payment.entity.TransactionRepository;
 import com.github.sats17.payment.exception.WalletException;
-import com.github.sats17.payment.model.KafkaEventRequest;
 import com.github.sats17.payment.model.PaymentMsResponse;
 import com.github.sats17.payment.model.WalletMsResponse;
 import com.github.sats17.payment.model.v2.PaymentProcessRequest;
@@ -55,7 +52,7 @@ public class PaymentService {
 			saveTransactionAsync(transaction);
 			AppUtils.printLog(
 					"Payment cannot be proceed, due to insufficient fund. Repsonse -> " + response.toString());
-			return new PaymentMsResponse(400, "Payment cannot be proceed, due to insufficient fund");
+			return new PaymentMsResponse(422, "Payment cannot be proceed, due to insufficient fund");
 		} else if (response.getStatus() == 40002) {
 			Transaction transaction = buildTransaction(request,
 					"Payment cannot be proceed, due to user not found in wallet db.", PaymentStatus.PAYMENT_FAILED,
