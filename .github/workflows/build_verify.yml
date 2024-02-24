@@ -32,9 +32,9 @@ jobs:
 
     - name: Maven Clean Install
       run: |
-        echo ${{ matrix.folders }}
+        ms_list=("tiny-saga-inventory-ms" "tiny-saga-wallet-ms")
         echo "Hello there"
-        for folder in ${{ matrix.folders }}; do
+        for folder in "${ms_list[@]}";  do
           cd $folder
           echo "Current directory: $(pwd)"
           ls -la
