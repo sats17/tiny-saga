@@ -4,6 +4,10 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/CI-Setup
 
 jobs:
   build:
