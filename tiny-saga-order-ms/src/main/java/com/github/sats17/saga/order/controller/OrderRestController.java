@@ -9,10 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.sats17.saga.order.configuration.Enums.OrchestratorOrderStatus;
 import com.github.sats17.saga.order.model.db.Order;
 import com.github.sats17.saga.order.model.request.CreateOrderSchema;
 import com.github.sats17.saga.order.model.response.FinalResponse;
@@ -68,6 +70,11 @@ public class OrderRestController {
 
 	@GetMapping("/v2/api/order/{orderId}")
 	public ResponseEntity<FinalResponse<Order>> getOrderV2(@PathVariable String orderId) throws Exception {
+		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
+	}
+	
+	@PutMapping("/v1/api/order/{orderId}/state/{stateName}")
+	public ResponseEntity<FinalResponse<Order>> updateOrder(@PathVariable String orderId, @PathVariable OrchestratorOrderStatus state) throws Exception {
 		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
 	}
 
