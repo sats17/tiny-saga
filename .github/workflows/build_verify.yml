@@ -29,6 +29,7 @@ jobs:
 
     - name: Maven Clean Install
       run: |
+        echo ${{ matrix.folders }}
         for folder in ${{ matrix.folders }}; do
           cd $folder
           echo "Current directory: $(pwd)"
