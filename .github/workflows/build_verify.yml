@@ -1,0 +1,52 @@
+name: Maven Clean Install Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/CI-Setup
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '17'
+
+    - name: List files and directories
+      run: |
+        ls -la
+        pwd
+        env
+        java -version
+        mvn -version
+
+    - name: Maven Clean Install
+      run: |
+        echo ${{ matrix.folders }}
+        for folder in ${{ matrix.folders }}; do
+          cd $folder
+          echo "Current directory: $(pwd)"
+          ls -la
+          mvn clean install
+          if [ $? -eq 0 ]; then
+            echo "Maven build successful for $folder"
+          else
+            echo "Maven build failed for $folder"
+            exit 1
+          fi
+          cd ..
+        done
+      env:
+        matrix.folders: |
+          tiny-saga-inventory-ms
