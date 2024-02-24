@@ -19,10 +19,20 @@ jobs:
         distribution: 'adopt'
         java-version: '17'
 
+    - name: List files and directories
+      run: |
+        ls -la
+        pwd
+        env
+        java -version
+        mvn -version
+
     - name: Maven Clean Install
       run: |
         for folder in ${{ matrix.folders }}; do
           cd $folder
+          echo "Current directory: $(pwd)"
+          ls -la
           mvn clean install
           if [ $? -eq 0 ]; then
             echo "Maven build successful for $folder"
@@ -34,4 +44,4 @@ jobs:
         done
       env:
         matrix.folders: |
-            tiny-saga-inventory-ms
+          tiny-saga-inventory-ms
