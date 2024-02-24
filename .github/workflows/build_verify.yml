@@ -25,7 +25,6 @@ jobs:
 
     - name: List files and directories
       run: |
-        ls -la
         pwd
         env
         java -version
@@ -34,6 +33,7 @@ jobs:
     - name: Maven Clean Install
       run: |
         echo ${{ matrix.folders }}
+        echo "Hello there"
         for folder in ${{ matrix.folders }}; do
           cd $folder
           echo "Current directory: $(pwd)"
