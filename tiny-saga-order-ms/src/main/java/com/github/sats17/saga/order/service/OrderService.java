@@ -20,22 +20,23 @@ import com.github.sats17.saga.order.utils.OrderUtils;
 
 @Service
 public class OrderService {
-	
+
 	@Autowired
 	OrderRepository orderRepository;
-	
+
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
 
 	@Value(value = "${spring.kafka.group_id}")
 	private String groupId;
-	
+
 //	@Autowired
 //	RawKafkaService rawKafkaService;
-	
+
 	ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
-	
-	public Order createOrder(String orderId, String userId, String productId, Long price, int productQuantity) throws Exception {
+
+	public Order createOrder(String orderId, String userId, String productId, Long price, int productQuantity,
+			String topicName) throws Exception {
 		Order order = new Order();
 		order.setOrderId(orderId);
 		order.setProductId(productId);
@@ -44,9 +45,9 @@ public class OrderService {
 		order.setQuantity(productQuantity);
 		order.setCreatedAt(OrderUtils.generateEpochTimestamp());
 		order.setUpdateAt(OrderUtils.generateEpochTimestamp());
-		
+
 		Order responseOrder = orderRepository.save(order);
-		if(responseOrder.getOrderId() != null) {
+		if (responseOrder.getOrderId() != null) {
 			KafkaEventRequest orderEvent = new KafkaEventRequest();
 			orderEvent.setEventId(OrderUtils.generateUniqueID());
 			orderEvent.setCorrelationId(OrderUtils.generateUniqueID());
@@ -60,25 +61,25 @@ public class OrderService {
 			orderEvent.setTimestamp(OrderUtils.generateEpochTimestamp());
 			orderEvent.setUserId(responseOrder.getUserId());
 			orderEvent.setVersion("1.0");
-			publishMessageToTopic("order-topic",  writer.writeValueAsString(orderEvent));
+			publishMessageToTopic(topicName, writer.writeValueAsString(orderEvent));
 			return responseOrder;
 		} else {
 			throw new Exception("Order creation failed");
 		}
-		
+
 	}
-	
+
 	private void publishMessageToTopic(String topicName, String message) {
 		kafkaTemplate.send(topicName, message);
 	}
 
 	public Order getOrder(String orderId) throws Exception {
 		Optional<Order> order = orderRepository.findById(orderId);
-		 if(order.isPresent()) {
-			 return order.get();
-		 } else {
-			 throw new Exception("Order not found");
-		 }
+		if (order.isPresent()) {
+			return order.get();
+		} else {
+			throw new Exception("Order not found");
+		}
 	}
 
 }
