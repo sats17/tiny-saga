@@ -1,0 +1,216 @@
+openapi: 3.0.3
+info:
+  title: Orders API
+  version: 1.0.0
+paths:
+  /v2/api/order/dev/healthcheck:
+    get:
+      summary: Get Health Check. This API Used in Orchestrator saga pattern.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              example: |
+                {
+                   "status": 200,
+                   "responseMessage": "Order server and Order DB is up and running"
+                 }
+  /v1/api/order:
+    post:
+      summary: >-
+        Create Order and returns current state of order. This API Used in Choreography saga.
+        pattern.
+      description:  Create Order and returns current state of order. This API Used in Choreography saga.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                  $ref: '#/components/schemas/CreateOrderSchema'
+              example: |
+                  {
+                      "userId": 1,
+                      "productId": "4",
+                      "price": 2,
+                      "productQuantity": 1
+                  }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example: |
+                {
+                    "status": {
+                        "rootCode": 20000,
+                        "rootType": "Success"
+                    },
+                    "response": {
+                        "orderId": "4866692",
+                        "userId": "1",
+                        "orderStatus": null,
+                        "paymentStatus": null,
+                        "orderFailReason": null,
+                        "productId": "4",
+                        "quantity": 1,
+                        "price": 2,
+                        "createdAt": 1708831192770,
+                        "updateAt": 1708831192770,
+                        "statusInfo": null
+                    }
+                }
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
+              example: |
+                {
+                  "status": 500,
+                  "responseMessage": "Inventory Server Error."
+                }
+  
+  /v2/api/order:
+    post:
+      summary: >-
+        Create Order and returns current state of order. This API Used in Orchestrator saga.
+        pattern.
+      description:  Create Order and returns current state of order. This API Used in Orchestrator saga.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                  $ref: '#/components/schemas/CreateOrderSchema'
+              example: |
+                  {
+                      "userId": 1,
+                      "productId": "4",
+                      "price": 2,
+                      "productQuantity": 1
+                  }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example: |
+                {
+                    "status": {
+                        "rootCode": 20000,
+                        "rootType": "Success"
+                    },
+                    "response": {
+                        "orderId": "4866692",
+                        "userId": "1",
+                        "orderStatus": null,
+                        "paymentStatus": null,
+                        "orderFailReason": null,
+                        "productId": "4",
+                        "quantity": 1,
+                        "price": 2,
+                        "createdAt": 1708831192770,
+                        "updateAt": 1708831192770,
+                        "statusInfo": null
+                    }
+                }
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
+              example: |
+                {
+                  "status": 500,
+                  "responseMessage": "Inventory Server Error."
+                }
+  /v2/api/order/{orderId}/status:
+    put:
+      summary: Update order status based on internal flows such as payment done or inventory reserved. This API is used for internal communication. This API Used in Orchestrator saga.
+      parameters:
+        - name: orderId
+          in: path
+          description: Order ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                  $ref: '#/components/schemas/UpdateOrderStatusSchema'
+              example: |
+                {
+                    "status": "PAYMENT_FAIL",
+                    "orderFailReason": "Insufficient fund in wallet"
+                }
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/Response'
+                example: |
+                    {
+                    "status": 200,
+                    "responseMessage": "Order updated succesfully"
+                    }
+   
+components:
+  schemas:
+    CreateOrderSchema:
+      type: object
+      properties:
+        userId:
+          type: string
+        productId:
+          type: string
+        price:
+          type: number
+        productQuantity:
+          type: integer
+      required:
+        - userId
+        - productId
+        - price
+        - productQuantity
+    UpdateOrderStatusSchema:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [PAYMENT_FAIL, INVENTORY_INSUFFICIENT, INVENTORY_RESERVERVED, PAYMENT_DONE, REFUND_DONE]
+        orderFailReason:
+          type: string
+      required:
+        - status
+        - orderFailReason
+    Response:
+      type: object
+      properties:
+        status:
+          type: integer
+        responseMessage:
+          type: string
+      required:
+        - status
+        - responseMessage

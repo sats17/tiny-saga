@@ -13,6 +13,7 @@ import com.github.sats17.saga.order.configuration.Enums;
 import com.github.sats17.saga.order.configuration.Enums.OrchestratorOrderStatus;
 import com.github.sats17.saga.order.model.db.Order;
 import com.github.sats17.saga.order.model.request.KafkaEventRequest;
+import com.github.sats17.saga.order.model.response.OrderDetails;
 import com.github.sats17.saga.order.repository.OrderRepository;
 import com.github.sats17.saga.order.utils.AppUtils;
 
@@ -33,7 +34,7 @@ public class OrderService {
 
 	ObjectWriter writer = new ObjectMapper().writer().withDefaultPrettyPrinter();
 
-	public Order createOrder(String orderId, String userId, String productId, Long price, int productQuantity,
+	public OrderDetails createOrder(String orderId, String userId, String productId, Long price, int productQuantity,
 			String topicName) throws Exception {
 		Order order = new Order();
 		order.setOrderId(orderId);
@@ -60,7 +61,7 @@ public class OrderService {
 			orderEvent.setUserId(responseOrder.getUserId());
 			orderEvent.setVersion("1.0");
 			publishMessageToTopic(topicName, writer.writeValueAsString(orderEvent));
-			return responseOrder;
+			return transformOrderData(responseOrder);
 		} else {
 			throw new Exception("Order creation failed");
 		}
@@ -71,13 +72,28 @@ public class OrderService {
 		kafkaTemplate.send(topicName, message);
 	}
 
-	public Order getOrder(String orderId) throws Exception {
+	public OrderDetails getOrder(String orderId) throws Exception {
 		Optional<Order> order = orderRepository.findById(orderId);
 		if (order.isPresent()) {
-			return order.get();
+			Order orderData = order.get();
+			return transformOrderData(orderData);
 		} else {
 			throw new Exception("Order not found");
 		}
+	}
+
+	private OrderDetails transformOrderData(Order order) {
+		OrderDetails orderDetails = new OrderDetails();
+		orderDetails.setOrderId(order.getOrderId());
+		orderDetails.setOrderStatus(order.getOrderStatus());
+		orderDetails.setPaymentStatus(order.getPaymentStatus());
+		orderDetails.setPrice(order.getPrice());
+		orderDetails.setProductId(order.getProductId());
+		orderDetails.setQuantity(order.getQuantity());
+		orderDetails.setStatusInfo(order.getStatusInfo());
+		orderDetails.setUserId(order.getUserId());
+		orderDetails.setOrderFailReason(order.getOrderFailReason());
+		return orderDetails;
 	}
 
 	public void updateOrderStatus(String orderId, OrchestratorOrderStatus status, String orderFailResaon) {

@@ -14,15 +14,15 @@ import com.github.sats17.saga.order.model.db.Order;
  */
 public class ApiResponseUtility {
 
-	public static ResponseEntity<FinalResponse<Order>> successResponseCreator(Order body) {
+	public static ResponseEntity<FinalResponse<OrderDetails>> successResponseCreator(OrderDetails orderDetails) {
 		Status status = new Status();
 		status.setRootCode(20000);
 		status.setRootType("Success");
 	
-		FinalResponse<Order> finalResponse = new FinalResponse<>();
+		FinalResponse<OrderDetails> finalResponse = new FinalResponse<>();
 		finalResponse.setStatus(status);
-		finalResponse.setResponse(body);
-		ResponseEntity<FinalResponse<Order>> successResponse = new ResponseEntity<>(
+		finalResponse.setResponse(orderDetails);
+		ResponseEntity<FinalResponse<OrderDetails>> successResponse = new ResponseEntity<>(
 				   finalResponse, HttpStatus.OK);
 		return successResponse;
 	}
