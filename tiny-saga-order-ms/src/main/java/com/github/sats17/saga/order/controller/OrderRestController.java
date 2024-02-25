@@ -73,7 +73,7 @@ public class OrderRestController {
 		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
 	}
 
-	@PutMapping("/v1/api/order/{orderId}/status")
+	@PutMapping("/v2/api/order/{orderId}/status")
 	public ResponseEntity<FinalResponse<Order>> updateOrderStatus(@PathVariable String orderId,
 			@RequestBody UpdateOrderStatusSchema data) throws Exception {
 		orderService.updateOrderStatus(orderId, data.getStatus(), data.getOrderFailReason());
