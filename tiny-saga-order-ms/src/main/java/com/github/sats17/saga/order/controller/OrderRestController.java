@@ -20,6 +20,7 @@ import com.github.sats17.saga.order.model.request.CreateOrderSchema;
 import com.github.sats17.saga.order.model.request.UpdateOrderStatusSchema;
 import com.github.sats17.saga.order.model.response.BasicOrderMsResponse;
 import com.github.sats17.saga.order.model.response.FinalResponse;
+import com.github.sats17.saga.order.model.response.OrderDetails;
 import com.github.sats17.saga.order.repository.OrderRepository;
 import com.github.sats17.saga.order.service.OrderService;
 import com.github.sats17.saga.order.utils.ApiResponseUtility;
@@ -42,7 +43,7 @@ public class OrderRestController {
 	public OrderRepository repository;
 
 	@PostMapping("/v1/api/order")
-	public ResponseEntity<FinalResponse<Order>> createOrder(@RequestBody CreateOrderSchema orderSchema)
+	public ResponseEntity<FinalResponse<OrderDetails>> createOrder(@RequestBody CreateOrderSchema orderSchema)
 			throws Exception {
 		String orderId = AppUtils.generateOrderId();
 		return ApiResponseUtility.successResponseCreator(orderService.createOrder(orderId, orderSchema.getUserId(),
@@ -50,7 +51,7 @@ public class OrderRestController {
 	}
 
 	@GetMapping("/v1/api/order/{orderId}")
-	public ResponseEntity<FinalResponse<Order>> getOrder(@PathVariable String orderId) throws Exception {
+	public ResponseEntity<FinalResponse<OrderDetails>> getOrder(@PathVariable String orderId) throws Exception {
 		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
 	}
 
@@ -60,18 +61,17 @@ public class OrderRestController {
 		Iterable<Order> transactionIterable = repository.findAll();
 		return StreamSupport.stream(transactionIterable.spliterator(), false).collect(Collectors.toList());
 	}
-	
+
 	@GetMapping("/v1/api/order//dev/healthcheck")
 	public ResponseEntity<BasicOrderMsResponse> getHealthCheckV1() {
 		// Check kafka for order-topic
 		AppUtils.printLog("Data present in transaction DB " + repository.count());
-		BasicOrderMsResponse response = new BasicOrderMsResponse(200,
-				"Order server and Order DB is up and running");
+		BasicOrderMsResponse response = new BasicOrderMsResponse(200, "Order server and Order DB is up and running");
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 	@PostMapping("/v2/api/order")
-	public ResponseEntity<FinalResponse<Order>> createOrderV2(@RequestBody CreateOrderSchema orderSchema)
+	public ResponseEntity<FinalResponse<OrderDetails>> createOrderV2(@RequestBody CreateOrderSchema orderSchema)
 			throws Exception {
 		String orderId = AppUtils.generateOrderId();
 		return ApiResponseUtility.successResponseCreator(
@@ -80,7 +80,7 @@ public class OrderRestController {
 	}
 
 	@GetMapping("/v2/api/order/{orderId}")
-	public ResponseEntity<FinalResponse<Order>> getOrderV2(@PathVariable String orderId) throws Exception {
+	public ResponseEntity<FinalResponse<OrderDetails>> getOrderV2(@PathVariable String orderId) throws Exception {
 		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
 	}
 
@@ -91,13 +91,12 @@ public class OrderRestController {
 		BasicOrderMsResponse response = new BasicOrderMsResponse(200, "Order updated succesfully");
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
-	
+
 	@GetMapping("/v2/api/order//dev/healthcheck")
 	public ResponseEntity<BasicOrderMsResponse> getHealthCheckV2() {
 		// Check kafka for orchestrator-topic
 		AppUtils.printLog("Data present in transaction DB " + repository.count());
-		BasicOrderMsResponse response = new BasicOrderMsResponse(200,
-				"Order server and Order DB is up and running");
+		BasicOrderMsResponse response = new BasicOrderMsResponse(200, "Order server and Order DB is up and running");
 		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
