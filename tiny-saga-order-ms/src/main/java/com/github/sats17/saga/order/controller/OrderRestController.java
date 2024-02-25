@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.sats17.saga.order.model.db.Order;
 import com.github.sats17.saga.order.model.request.CreateOrderSchema;
 import com.github.sats17.saga.order.model.request.UpdateOrderStatusSchema;
+import com.github.sats17.saga.order.model.response.BasicOrderMsResponse;
 import com.github.sats17.saga.order.model.response.FinalResponse;
 import com.github.sats17.saga.order.repository.OrderRepository;
 import com.github.sats17.saga.order.service.OrderService;
@@ -58,6 +60,15 @@ public class OrderRestController {
 		Iterable<Order> transactionIterable = repository.findAll();
 		return StreamSupport.stream(transactionIterable.spliterator(), false).collect(Collectors.toList());
 	}
+	
+	@GetMapping("/v1/api/order//dev/healthcheck")
+	public ResponseEntity<BasicOrderMsResponse> getHealthCheckV1() {
+		// Check kafka for order-topic
+		AppUtils.printLog("Data present in transaction DB " + repository.count());
+		BasicOrderMsResponse response = new BasicOrderMsResponse(200,
+				"Order server and Order DB is up and running");
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
 
 	@PostMapping("/v2/api/order")
 	public ResponseEntity<FinalResponse<Order>> createOrderV2(@RequestBody CreateOrderSchema orderSchema)
@@ -74,10 +85,20 @@ public class OrderRestController {
 	}
 
 	@PutMapping("/v2/api/order/{orderId}/status")
-	public ResponseEntity<FinalResponse<Order>> updateOrderStatus(@PathVariable String orderId,
+	public ResponseEntity<BasicOrderMsResponse> updateOrderStatus(@PathVariable String orderId,
 			@RequestBody UpdateOrderStatusSchema data) throws Exception {
 		orderService.updateOrderStatus(orderId, data.getStatus(), data.getOrderFailReason());
-		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
+		BasicOrderMsResponse response = new BasicOrderMsResponse(200, "Order updated succesfully");
+		return ResponseEntity.status(HttpStatus.OK).body(response);
+	}
+	
+	@GetMapping("/v2/api/order//dev/healthcheck")
+	public ResponseEntity<BasicOrderMsResponse> getHealthCheckV2() {
+		// Check kafka for orchestrator-topic
+		AppUtils.printLog("Data present in transaction DB " + repository.count());
+		BasicOrderMsResponse response = new BasicOrderMsResponse(200,
+				"Order server and Order DB is up and running");
+		return ResponseEntity.status(HttpStatus.OK).body(response);
 	}
 
 }

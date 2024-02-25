@@ -3,7 +3,7 @@ info:
   title: Orders API
   version: 1.0.0
 paths:
-  /v2/api/inventory/dev/healthcheck:
+  /v2/api/order/dev/healthcheck:
     get:
       summary: Get Health Check. This API Used in Orchestrator saga pattern.
       responses:
@@ -14,8 +14,69 @@ paths:
               example: |
                 {
                    "status": 200,
-                   "responseMessage": "Inventory server and Inventory DB is up and running"
+                   "responseMessage": "Order server and Order DB is up and running"
                  }
+  /v1/api/order:
+    post:
+      summary: >-
+        Create Order and returns current state of order. This API Used in Choreography saga.
+        pattern.
+      description:  Create Order and returns current state of order. This API Used in Choreography saga.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                  $ref: '#/components/schemas/CreateOrderSchema'
+              example: |
+                  {
+                      "userId": 1,
+                      "productId": "4",
+                      "price": 2,
+                      "productQuantity": 1
+                  }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              example: |
+                {
+                    "status": {
+                        "rootCode": 20000,
+                        "rootType": "Success"
+                    },
+                    "response": {
+                        "orderId": "4866692",
+                        "userId": "1",
+                        "orderStatus": null,
+                        "paymentStatus": null,
+                        "orderFailReason": null,
+                        "productId": "4",
+                        "quantity": 1,
+                        "price": 2,
+                        "createdAt": 1708831192770,
+                        "updateAt": 1708831192770,
+                        "statusInfo": null
+                    }
+                }
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
+              example: |
+                {
+                  "status": 500,
+                  "responseMessage": "Inventory Server Error."
+                }
+  
   /v2/api/order:
     post:
       summary: >-
@@ -76,42 +137,44 @@ paths:
                   "status": 500,
                   "responseMessage": "Inventory Server Error."
                 }
-  /v2/api/inventory/dev/products:
+  /v2/api/order/{orderId}/status:
     put:
-      summary: Update product quantity by productId in inventory. This API used for development/debugging purpose.
+      summary: Update order status based on internal flows such as payment done or inventory reserved. This API is used for internal communication. This API Used in Orchestrator saga.
       parameters:
-        - name: productId
-          in: query
-          description: ID of the product to update
+        - name: orderId
+          in: path
+          description: Order ID
           required: true
           schema:
             type: string
-        - name: productQuantity
-          in: query
-          description: Quantity to add to the product
-          required: true
-          schema:
-            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                  $ref: '#/components/schemas/UpdateOrderStatusSchema'
+              example: |
+                {
+                    "status": "PAYMENT_FAIL",
+                    "orderFailReason": "Insufficient fund in wallet"
+                }
       responses:
         '200':
           description: Successful operation
           content:
             application/json:
               schema:
-                type: array
+                type: object
                 items:
-                  $ref: '#/components/schemas/Inventory'
-    get:
-      summary: Get all products from inventory. This API used for development/debugging purpose.
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Inventory'
+                  $ref: '#/components/schemas/Response'
+                example: |
+                    {
+                    "status": 200,
+                    "responseMessage": "Order updated succesfully"
+                    }
+   
 components:
   schemas:
     CreateOrderSchema:
