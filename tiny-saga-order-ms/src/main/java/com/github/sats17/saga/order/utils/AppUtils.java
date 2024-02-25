@@ -2,7 +2,7 @@ package com.github.sats17.saga.order.utils;
 
 import java.util.UUID;
 
-public class OrderUtils {
+public class AppUtils {
 	
 	public static String generateOrderId() {
 		long leftLimit = 1000000L;

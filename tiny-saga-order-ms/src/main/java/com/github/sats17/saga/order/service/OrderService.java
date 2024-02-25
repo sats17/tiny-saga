@@ -4,19 +4,17 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.github.sats17.saga.order.configuration.Enums;
-import com.github.sats17.saga.order.enums.Status;
+import com.github.sats17.saga.order.configuration.Enums.OrchestratorOrderStatus;
 import com.github.sats17.saga.order.model.db.Order;
-import com.github.sats17.saga.order.model.db.OrderStatus;
 import com.github.sats17.saga.order.model.request.KafkaEventRequest;
 import com.github.sats17.saga.order.repository.OrderRepository;
-import com.github.sats17.saga.order.utils.OrderUtils;
+import com.github.sats17.saga.order.utils.AppUtils;
 
 @Service
 public class OrderService {
@@ -43,14 +41,14 @@ public class OrderService {
 		order.setUserId(userId);
 		order.setPrice(price);
 		order.setQuantity(productQuantity);
-		order.setCreatedAt(OrderUtils.generateEpochTimestamp());
-		order.setUpdateAt(OrderUtils.generateEpochTimestamp());
+		order.setCreatedAt(AppUtils.generateEpochTimestamp());
+		order.setUpdateAt(AppUtils.generateEpochTimestamp());
 
 		Order responseOrder = orderRepository.save(order);
 		if (responseOrder.getOrderId() != null) {
 			KafkaEventRequest orderEvent = new KafkaEventRequest();
-			orderEvent.setEventId(OrderUtils.generateUniqueID());
-			orderEvent.setCorrelationId(OrderUtils.generateUniqueID());
+			orderEvent.setEventId(AppUtils.generateUniqueID());
+			orderEvent.setCorrelationId(AppUtils.generateUniqueID());
 			orderEvent.setEventName(Enums.EventName.ORDER_INITIATED);
 			orderEvent.setOrderId(responseOrder.getOrderId());
 			orderEvent.setOrderStatus(Enums.OrderStatus.INITIATED);
@@ -58,7 +56,7 @@ public class OrderService {
 			orderEvent.setPrice(price);
 			orderEvent.setProductId(responseOrder.getProductId());
 			orderEvent.setProductQuantity(productQuantity);
-			orderEvent.setTimestamp(OrderUtils.generateEpochTimestamp());
+			orderEvent.setTimestamp(AppUtils.generateEpochTimestamp());
 			orderEvent.setUserId(responseOrder.getUserId());
 			orderEvent.setVersion("1.0");
 			publishMessageToTopic(topicName, writer.writeValueAsString(orderEvent));
@@ -79,6 +77,68 @@ public class OrderService {
 			return order.get();
 		} else {
 			throw new Exception("Order not found");
+		}
+	}
+
+	public void updateOrderStatus(String orderId, OrchestratorOrderStatus status, String orderFailResaon) {
+		Optional<Order> order = orderRepository.findById(orderId);
+		switch (status) {
+		case PAYMENT_DONE:
+			if (order.isPresent()) {
+				order.get().setPaymentStatus(Enums.PaymentStatus.PAYMENT_DONE);
+				order.get().setUpdateAt(AppUtils.generateEpochTimestamp());
+				orderRepository.save(order.get());
+				AppUtils.printLog("PAYMENT_DONE: Updted order status to payment done");
+			} else {
+				AppUtils.printLog("Order data not found for orderId: " + orderId);
+			}
+			break;
+		case INVENTORY_RESERVERVED:
+			if (order.isPresent()) {
+				order.get().setOrderStatus(Enums.OrderStatus.ORDER_PlACED);
+				order.get().setUpdateAt(AppUtils.generateEpochTimestamp());
+				orderRepository.save(order.get());
+				AppUtils.printLog("INVENTORY_RESERVERVED: Updted order status to inventory reserved");
+			} else {
+				AppUtils.printLog("Order data not found for orderId: " + orderId);
+			}
+			break;
+		case INVENTORY_INSUFFICIENT:
+			AppUtils.printLog("INVENTORY_INSUFFICIENT Event not supported");
+			if (order.isPresent()) {
+				order.get().setPaymentStatus(Enums.PaymentStatus.REFUND_INITIATED);
+				order.get().setUpdateAt(AppUtils.generateEpochTimestamp());
+				order.get().setOrderStatus(Enums.OrderStatus.ORDER_FAIL);
+				order.get().setOrderFailReason(orderFailResaon);
+				orderRepository.save(order.get());
+				AppUtils.printLog("INVENTORY_INSUFFICIENT: Updted order status to refund initiated and order fail.");
+			} else {
+				AppUtils.printLog("Order data not found for orderId: " + orderId);
+			}
+			break;
+		case PAYMENT_FAIL:
+			if (order.isPresent()) {
+				order.get().setPaymentStatus(Enums.PaymentStatus.PAYMENT_FAILED);
+				order.get().setOrderStatus(Enums.OrderStatus.ORDER_FAIL);
+				order.get().setUpdateAt(AppUtils.generateEpochTimestamp());
+				order.get().setOrderFailReason(orderFailResaon);
+				orderRepository.save(order.get());
+				AppUtils.printLog("PAYMENT_FAIL: Updted order status to payment fail");
+			} else {
+				AppUtils.printLog("Order data not found for orderId: " + orderId);
+			}
+			break;
+		case REFUND_DONE:
+			if (order.isPresent()) {
+				order.get().setPaymentStatus(Enums.PaymentStatus.REFUND_DONE);
+				order.get().setOrderStatus(Enums.OrderStatus.ORDER_FAIL);
+				order.get().setUpdateAt(AppUtils.generateEpochTimestamp());
+				orderRepository.save(order.get());
+				AppUtils.printLog("PAYMENT_DONE: Updted order status to payment done");
+			} else {
+				AppUtils.printLog("Order data not found for orderId: " + orderId);
+			}
+			break;
 		}
 	}
 
