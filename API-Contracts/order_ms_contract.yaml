@@ -43,27 +43,19 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                  $ref: '#/components/schemas/OrderDetails'
               example: |
-                {
-                    "status": {
-                        "rootCode": 20000,
-                        "rootType": "Success"
-                    },
-                    "response": {
-                        "orderId": "4866692",
-                        "userId": "1",
-                        "orderStatus": null,
-                        "paymentStatus": null,
-                        "orderFailReason": null,
-                        "productId": "4",
-                        "quantity": 1,
-                        "price": 2,
-                        "createdAt": 1708831192770,
-                        "updateAt": 1708831192770,
-                        "statusInfo": null
-                    }
-                }
+                  {
+                    "orderId": "123456789",
+                    "userId": "987654321",
+                    "orderStatus": "ORDER_DELIVERED",
+                    "paymentStatus": "PAYMENT_DONE",
+                    "orderFailReason": null,
+                    "productId": "ABC123",
+                    "quantity": 2,
+                    "price": 2500,
+                    "statusInfo": "Your order has been successfully delivered. Thank you for shopping with us!"
+                  }
         '500':
           description: Server error
           content:
@@ -104,27 +96,20 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                  $ref: '#/components/schemas/OrderDetails'
               example: |
-                {
-                    "status": {
-                        "rootCode": 20000,
-                        "rootType": "Success"
-                    },
-                    "response": {
-                        "orderId": "4866692",
-                        "userId": "1",
-                        "orderStatus": null,
-                        "paymentStatus": null,
-                        "orderFailReason": null,
-                        "productId": "4",
-                        "quantity": 1,
-                        "price": 2,
-                        "createdAt": 1708831192770,
-                        "updateAt": 1708831192770,
-                        "statusInfo": null
-                    }
-                }
+                  {
+                    "orderId": "123456789",
+                    "userId": "987654321",
+                    "orderStatus": "ORDER_DELIVERED",
+                    "paymentStatus": "PAYMENT_DONE",
+                    "orderFailReason": null,
+                    "productId": "ABC123",
+                    "quantity": 2,
+                    "price": 2500,
+                    "statusInfo": "Your order has been successfully delivered. Thank you for shopping with us!"
+                  }
+
         '500':
           description: Server error
           content:
@@ -214,3 +199,57 @@ components:
       required:
         - status
         - responseMessage
+
+    OrderDetails:
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: The ID of the order.
+        userId:
+          type: string
+          description: The ID of the user who placed the order.
+        orderStatus:
+          $ref: '#/components/schemas/OrderStatus'
+          description: The status of the order.
+        paymentStatus:
+          $ref: '#/components/schemas/PaymentStatus'
+          description: The payment status of the order.
+        orderFailReason:
+          type: string
+          description: The reason for order failure, if any.
+        productId:
+          type: string
+          description: The ID of the product in the order.
+        quantity:
+          type: integer
+          format: int32
+          description: The quantity of the product in the order.
+        price:
+          type: integer
+          format: int64
+          description: The price of the product in the order.
+        statusInfo:
+          type: string
+          description: Additional status information about the order.
+
+    OrderStatus:
+      type: string
+      enum: 
+        - INITIATED
+        - ORDER_PlACED
+        - ORDER_DELIEVERED
+        - ORDER_FAIL
+      description: The status of the order.
+
+    PaymentStatus:
+      type: string
+      enum: 
+        - PAYMENT_INITIATED
+        - PAYMENT_DONE
+        - PAYMENT_FAILED
+        - REFUND_INITIATED
+        - REFUND_DONE
+        - REFUND_FAILED
+        - PAYMENT_FAIL_NO_AMOUNT_DEBIT
+      description: The payment status of the order.
