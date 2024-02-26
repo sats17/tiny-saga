@@ -19,11 +19,9 @@ import com.github.sats17.saga.order.model.db.Order;
 import com.github.sats17.saga.order.model.request.CreateOrderSchema;
 import com.github.sats17.saga.order.model.request.UpdateOrderStatusSchema;
 import com.github.sats17.saga.order.model.response.BasicOrderMsResponse;
-import com.github.sats17.saga.order.model.response.FinalResponse;
 import com.github.sats17.saga.order.model.response.OrderDetails;
 import com.github.sats17.saga.order.repository.OrderRepository;
 import com.github.sats17.saga.order.service.OrderService;
-import com.github.sats17.saga.order.utils.ApiResponseUtility;
 import com.github.sats17.saga.order.utils.AppUtils;
 
 /**
@@ -43,16 +41,18 @@ public class OrderRestController {
 	public OrderRepository repository;
 
 	@PostMapping("/v1/api/order")
-	public ResponseEntity<FinalResponse<OrderDetails>> createOrder(@RequestBody CreateOrderSchema orderSchema)
+	public ResponseEntity<OrderDetails> createOrder(@RequestBody CreateOrderSchema orderSchema)
 			throws Exception {
 		String orderId = AppUtils.generateOrderId();
-		return ApiResponseUtility.successResponseCreator(orderService.createOrder(orderId, orderSchema.getUserId(),
-				orderSchema.getProductId(), orderSchema.getPrice(), orderSchema.getProductQuantity(), "order-topic"));
+		OrderDetails details = orderService.createOrder(orderId, orderSchema.getUserId(), orderSchema.getProductId(),
+				orderSchema.getPrice(), orderSchema.getProductQuantity(), "order-topic");
+		return ResponseEntity.status(HttpStatus.OK).body(details);
 	}
 
 	@GetMapping("/v1/api/order/{orderId}")
-	public ResponseEntity<FinalResponse<OrderDetails>> getOrder(@PathVariable String orderId) throws Exception {
-		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
+	public ResponseEntity<OrderDetails> getOrder(@PathVariable String orderId) throws Exception {
+		OrderDetails details = orderService.getOrder(orderId);
+		return ResponseEntity.status(HttpStatus.OK).body(details);
 	}
 
 	@GetMapping("/v1/api/order/dev/orders")
@@ -71,17 +71,18 @@ public class OrderRestController {
 	}
 
 	@PostMapping("/v2/api/order")
-	public ResponseEntity<FinalResponse<OrderDetails>> createOrderV2(@RequestBody CreateOrderSchema orderSchema)
+	public ResponseEntity<OrderDetails> createOrderV2(@RequestBody CreateOrderSchema orderSchema)
 			throws Exception {
 		String orderId = AppUtils.generateOrderId();
-		return ApiResponseUtility.successResponseCreator(
-				orderService.createOrder(orderId, orderSchema.getUserId(), orderSchema.getProductId(),
-						orderSchema.getPrice(), orderSchema.getProductQuantity(), "orchestrator-topic"));
+		OrderDetails details = orderService.createOrder(orderId, orderSchema.getUserId(), orderSchema.getProductId(),
+				orderSchema.getPrice(), orderSchema.getProductQuantity(), "orchestrator-topic");
+		return ResponseEntity.status(HttpStatus.OK).body(details);
 	}
 
 	@GetMapping("/v2/api/order/{orderId}")
-	public ResponseEntity<FinalResponse<OrderDetails>> getOrderV2(@PathVariable String orderId) throws Exception {
-		return ApiResponseUtility.successResponseCreator(orderService.getOrder(orderId));
+	public ResponseEntity<OrderDetails> getOrderV2(@PathVariable String orderId) throws Exception {
+		OrderDetails details = orderService.getOrder(orderId);
+		return ResponseEntity.status(HttpStatus.OK).body(details);
 	}
 
 	@PutMapping("/v2/api/order/{orderId}/status")
