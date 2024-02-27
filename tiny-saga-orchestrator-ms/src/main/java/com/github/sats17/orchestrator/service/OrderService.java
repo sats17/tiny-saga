@@ -11,14 +11,17 @@ import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sats17.orchestrator.configurations.ConfigProperties;
+import com.github.sats17.orchestrator.configurations.Enums.OrchestratorOrderStatus;
 import com.github.sats17.orchestrator.configurations.ServiceEndpoint;
 import com.github.sats17.orchestrator.exception.InternalServerException;
 import com.github.sats17.orchestrator.exception.ServiceException;
 import com.github.sats17.orchestrator.model.InventoryMsResponse;
 import com.github.sats17.orchestrator.model.KafkaEventRequest;
+import com.github.sats17.orchestrator.model.OrderMsResponse;
 import com.github.sats17.orchestrator.model.PaymentMsRequest;
 import com.github.sats17.orchestrator.model.PaymentMsResponse;
 import com.github.sats17.orchestrator.model.ReserveInventoryRequest;
+import com.github.sats17.orchestrator.model.UpdateOrderStatusRequest;
 import com.github.sats17.orchestrator.utils.AppUtils;
 
 import reactor.core.publisher.Mono;
@@ -31,6 +34,9 @@ public class OrderService {
 
 	@Autowired
 	ServiceEndpoint inventoryConfig;
+	
+	@Autowired
+	ServiceEndpoint orderConfig;
 
 	@Autowired
 	ObjectMapper mapper;
@@ -38,11 +44,20 @@ public class OrderService {
 	@Autowired
 	ConfigProperties configProperties;
 
+	
+	// Fix logic for how to send order status.
+	// We are doing two time status validation for each ms response. how to avoid that ?
 	public void processOrderInitialization(KafkaEventRequest request) {
-		Mono<InventoryMsResponse> paymentMono = processPayment(request).flatMap(paymentMsResponse -> {
+		Mono<Object> paymentMono = processPayment(request).flatMap(paymentMsResponse -> {
 			System.out.println("Payment ms response recieved");
 			if (paymentMsResponse.getStatus() == 200) {
-				return reserveInventory(request);
+				return reserveInventory(request).flatMap(inventoryMsResponse -> {
+					if(inventoryMsResponse.getStatus() == 200) {
+						return updateOrderStatus(request.getOrderId(), OrchestratorOrderStatus.INVENTORY_RESERVERVED, null);
+					} else {
+						return Mono.error(new InternalServerException("Inventory MS did not returned 200 response"));
+					}
+				});
 			}
 			return Mono.error(new RuntimeException("Error occured from payment MS"));
 		});
@@ -71,7 +86,7 @@ public class OrderService {
 	}
 
 	private Mono<InventoryMsResponse> reserveInventory(KafkaEventRequest request) {
-		System.out.println("Request received for inventory");
+		AppUtils.printLog("Request received for inventory");
 		ReserveInventoryRequest reserveInventoryRequest = new ReserveInventoryRequest();
 		reserveInventoryRequest.setQuantity(request.getProductQuantity());
 
@@ -93,13 +108,45 @@ public class OrderService {
 					return Mono.error(new ServiceException(resp.getServiceName(),
 							clientResponse.statusCode().value(), resp.getResponseMessage()));
 				} catch (Exception e) {
-					return Mono.error(new ServiceException("payment ms", clientResponse.statusCode().value(),
-							"Invalid resposne body received from payment ms for 4XX errors"));
+					return Mono.error(new ServiceException("inventory ms", clientResponse.statusCode().value(),
+							"Invalid resposne body received from inventory ms for 4XX errors"));
 				}
 			});
 		}).bodyToMono(InventoryMsResponse.class);
 	}
 
+	private Mono<OrderMsResponse> updateOrderStatus(String orderId, OrchestratorOrderStatus status, String orderFailReason) {
+		AppUtils.printLog("Request received for updating order status");
+		UpdateOrderStatusRequest updateOrderStatusRequest = new UpdateOrderStatusRequest();
+		updateOrderStatusRequest.setStatus(status);
+		updateOrderStatusRequest.setOrderFailReason(orderFailReason);
+
+		String requestString;
+		try {
+			requestString = mapper.writeValueAsString(updateOrderStatusRequest);
+		} catch (JsonProcessingException e) {
+			throw new InternalServerException(e.getMessage());
+		}
+		Map<String, String> params = new HashMap<>();
+		params.put("orderId", orderId);
+		String updateOrderStatusPath = AppUtils
+				.replacePathParams(configProperties.getOrder().get("updateOrderStatusPath"), params);
+		ResponseSpec spec = orderConfig.put(updateOrderStatusPath, requestString);
+		return spec.onStatus(httpStatus -> httpStatus.is4xxClientError(), clientResponse -> {
+			return clientResponse.bodyToMono(String.class).flatMap(body -> {
+				try {
+					OrderMsResponse resp = mapper.readValue(body, OrderMsResponse.class);
+					return Mono.error(new ServiceException(resp.getServiceName(),
+							clientResponse.statusCode().value(), resp.getResponseMessage()));
+				} catch (Exception e) {
+					return Mono.error(new ServiceException("order ms", clientResponse.statusCode().value(),
+							"Invalid resposne body received from order ms for 4XX errors"));
+				}
+			});
+		}).bodyToMono(OrderMsResponse.class);
+	}
+
+	
 	private Mono<ServiceException> handle4XXError(ClientResponse clientResponse, KafkaEventRequest request,
 			String serviceName) {
 		return clientResponse.bodyToMono(String.class).flatMap(body -> {
