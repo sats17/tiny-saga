@@ -47,4 +47,8 @@ public class Enums {
 		REFUND_FAILED
 	}
 	
+	
+	public enum OrchestratorOrderStatus {
+		PAYMENT_FAIL, INVENTORY_INSUFFICIENT, INVENTORY_RESERVERVED, PAYMENT_DONE, REFUND_DONE
+	}
 }

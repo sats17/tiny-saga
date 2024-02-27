@@ -33,5 +33,13 @@ public class ServiceEndpointConfig {
 		String protocol = configProperties.getInventory().get(PROTOCOL);
 		return new ServiceEndpoint(WebClient.create(protocol + "://" + host + ":" + port));
 	}
+	
+	@Bean
+	ServiceEndpoint orderConfig() {
+		String host = configProperties.getOrder().get(HOST);
+		String port = configProperties.getOrder().get(PORT);
+		String protocol = configProperties.getOrder().get(PROTOCOL);
+		return new ServiceEndpoint(WebClient.create(protocol + "://" + host + ":" + port));
+	}
 
 }

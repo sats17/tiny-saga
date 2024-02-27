@@ -24,5 +24,6 @@ services:
     host: localhost
     port: 8081
     protocol: http
+    updateOrderStatusPath: "/v2/api/order/{orderId}/status"
 
   
