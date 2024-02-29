@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient.ResponseSpec;
@@ -34,7 +35,7 @@ public class OrderService {
 
 	@Autowired
 	ServiceEndpoint inventoryConfig;
-	
+
 	@Autowired
 	ServiceEndpoint orderConfig;
 
@@ -44,23 +45,19 @@ public class OrderService {
 	@Autowired
 	ConfigProperties configProperties;
 
-	
 	// Fix logic for how to send order status.
-	// We are doing two time status validation for each ms response. how to avoid that ?
+	// We are doing two time status validation for each ms response. how to avoid
+	// that ?
+	// Solution : Do not validate http response code in response body. Always check
+	// http status code.
+	// Based on http error status code decide what to do with order.
 	public void processOrderInitialization(KafkaEventRequest request) {
 		Mono<Object> paymentMono = processPayment(request).flatMap(paymentMsResponse -> {
-			System.out.println("Payment ms response recieved");
-			if (paymentMsResponse.getStatus() == 200) {
-				return reserveInventory(request).flatMap(inventoryMsResponse -> {
-					if(inventoryMsResponse.getStatus() == 200) {
-						return updateOrderStatus(request.getOrderId(), OrchestratorOrderStatus.INVENTORY_RESERVERVED, null);
-					} else {
-						return Mono.error(new InternalServerException("Inventory MS did not returned 200 response"));
-					}
-				});
-			}
-			return Mono.error(new RuntimeException("Error occured from payment MS"));
+			AppUtils.printLog("Success response recieved from payment, will process inventory");
+			return reserveInventory(request).flatMap(inventoryMsResponse -> updateOrderStatus(request.getOrderId(),
+					OrchestratorOrderStatus.INVENTORY_RESERVERVED, null));
 		});
+		
 		// Subscribe method invoke payment ms mono as well as all mono/flux chain that
 		// present inside flatmap.
 		paymentMono.subscribe();
@@ -80,8 +77,12 @@ public class OrderService {
 		}
 		ResponseSpec spec = paymentConfig.post(configProperties.getPayment().get("orderPayPath"), requestString);
 		return spec
-				.onStatus(httpStatus -> httpStatus.is4xxClientError(),
-						  clientResponse -> handle4XXError(clientResponse, request, "paymentMs"))
+				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.NOT_FOUND),
+						clientResponse -> handlePaymentUserNotFound(clientResponse, request, "paymentMs"))
+				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.BAD_REQUEST),
+						clientResponse -> handleAuthorizationError(clientResponse, request, "paymentMs"))
+				.onStatus(httpStatus -> httpStatus.is5xxServerError(),
+						clientResponse -> handle5XXError(clientResponse, request, "paymentMs"))
 				.bodyToMono(PaymentMsResponse.class);
 	}
 
@@ -105,8 +106,8 @@ public class OrderService {
 			return clientResponse.bodyToMono(String.class).flatMap(body -> {
 				try {
 					InventoryMsResponse resp = mapper.readValue(body, InventoryMsResponse.class);
-					return Mono.error(new ServiceException(resp.getServiceName(),
-							clientResponse.statusCode().value(), resp.getResponseMessage()));
+					return Mono.error(new ServiceException(resp.getServiceName(), clientResponse.statusCode().value(),
+							resp.getResponseMessage()));
 				} catch (Exception e) {
 					return Mono.error(new ServiceException("inventory ms", clientResponse.statusCode().value(),
 							"Invalid resposne body received from inventory ms for 4XX errors"));
@@ -115,7 +116,8 @@ public class OrderService {
 		}).bodyToMono(InventoryMsResponse.class);
 	}
 
-	private Mono<OrderMsResponse> updateOrderStatus(String orderId, OrchestratorOrderStatus status, String orderFailReason) {
+	private Mono<OrderMsResponse> updateOrderStatus(String orderId, OrchestratorOrderStatus status,
+			String orderFailReason) {
 		AppUtils.printLog("Request received for updating order status");
 		UpdateOrderStatusRequest updateOrderStatusRequest = new UpdateOrderStatusRequest();
 		updateOrderStatusRequest.setStatus(status);
@@ -136,8 +138,8 @@ public class OrderService {
 			return clientResponse.bodyToMono(String.class).flatMap(body -> {
 				try {
 					OrderMsResponse resp = mapper.readValue(body, OrderMsResponse.class);
-					return Mono.error(new ServiceException(resp.getServiceName(),
-							clientResponse.statusCode().value(), resp.getResponseMessage()));
+					return Mono.error(new ServiceException(resp.getServiceName(), clientResponse.statusCode().value(),
+							resp.getResponseMessage()));
 				} catch (Exception e) {
 					return Mono.error(new ServiceException("order ms", clientResponse.statusCode().value(),
 							"Invalid resposne body received from order ms for 4XX errors"));
@@ -146,11 +148,41 @@ public class OrderService {
 		}).bodyToMono(OrderMsResponse.class);
 	}
 
-	
+	private Mono<ServiceException> handlePaymentUserNotFound(ClientResponse clientResponse, KafkaEventRequest request,
+			String serviceName) {
+		return clientResponse.bodyToMono(String.class).flatMap(body -> {
+			AppUtils.printLog("404 user not found occured from " + serviceName);
+			AppUtils.printLog("Body = " + body);
+			// TODO: if user not, update order MS status with fail and invoke notification
+			// ms service
+			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+		});
+	}
+
+	private Mono<ServiceException> handleAuthorizationError(ClientResponse clientResponse, KafkaEventRequest request,
+			String serviceName) {
+		return clientResponse.bodyToMono(String.class).flatMap(body -> {
+			AppUtils.printLog("Authorization error occured " + serviceName);
+			AppUtils.printLog("Body = " + body);
+			// TODO: Send order event to DLQ and some persistent store and Raise P1
+			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+		});
+	}
+
 	private Mono<ServiceException> handle4XXError(ClientResponse clientResponse, KafkaEventRequest request,
 			String serviceName) {
 		return clientResponse.bodyToMono(String.class).flatMap(body -> {
 			AppUtils.printLog("4XX error occured from " + serviceName);
+			AppUtils.printLog("Body = " + body);
+			// TODO: We need to think what we will do in such scenario ?
+			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+		});
+	}
+
+	private Mono<ServiceException> handle5XXError(ClientResponse clientResponse, KafkaEventRequest request,
+			String serviceName) {
+		return clientResponse.bodyToMono(String.class).flatMap(body -> {
+			AppUtils.printLog("5XX error occured from " + serviceName);
 			AppUtils.printLog("Body = " + body);
 			// TODO: We need to think what we will do in such scenario ?
 			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
