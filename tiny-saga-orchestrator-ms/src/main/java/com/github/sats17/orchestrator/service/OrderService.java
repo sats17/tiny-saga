@@ -51,13 +51,13 @@ public class OrderService {
 	// Solution : Do not validate http response code in response body. Always check
 	// http status code.
 	// Based on http error status code decide what to do with order.
-	public void processOrderInitialization(KafkaEventRequest request) {
+	public void processOrder(KafkaEventRequest request) {
 		Mono<Object> paymentMono = processPayment(request).flatMap(paymentMsResponse -> {
 			AppUtils.printLog("Success response recieved from payment, will process inventory");
 			return reserveInventory(request).flatMap(inventoryMsResponse -> updateOrderStatus(request.getOrderId(),
 					OrchestratorOrderStatus.INVENTORY_RESERVERVED, null));
 		});
-		
+
 		// Subscribe method invoke payment ms mono as well as all mono/flux chain that
 		// present inside flatmap.
 		paymentMono.subscribe();
@@ -102,18 +102,14 @@ public class OrderService {
 		String reserveInventoryPath = AppUtils
 				.replacePathParams(configProperties.getInventory().get("reserveInventoryPath"), params);
 		ResponseSpec spec = inventoryConfig.put(reserveInventoryPath, requestString);
-		return spec.onStatus(httpStatus -> httpStatus.is4xxClientError(), clientResponse -> {
-			return clientResponse.bodyToMono(String.class).flatMap(body -> {
-				try {
-					InventoryMsResponse resp = mapper.readValue(body, InventoryMsResponse.class);
-					return Mono.error(new ServiceException(resp.getServiceName(), clientResponse.statusCode().value(),
-							resp.getResponseMessage()));
-				} catch (Exception e) {
-					return Mono.error(new ServiceException("inventory ms", clientResponse.statusCode().value(),
-							"Invalid resposne body received from inventory ms for 4XX errors"));
-				}
-			});
-		}).bodyToMono(InventoryMsResponse.class);
+		return spec
+				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.NOT_FOUND),
+						clientResponse -> handleProductNotFoundInInventory(clientResponse, request, "inventoryMs"))
+				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.GONE),
+						clientResponse -> handleQuantityNotSufficientInInventory(clientResponse, request, "inventoryMs"))
+				.onStatus(httpStatus -> httpStatus.is5xxServerError(),
+						clientResponse -> handle5XXError(clientResponse, request, "inventoryMs"))
+				.bodyToMono(InventoryMsResponse.class);
 	}
 
 	private Mono<OrderMsResponse> updateOrderStatus(String orderId, OrchestratorOrderStatus status,
@@ -152,6 +148,28 @@ public class OrderService {
 			String serviceName) {
 		return clientResponse.bodyToMono(String.class).flatMap(body -> {
 			AppUtils.printLog("404 user not found occured from " + serviceName);
+			AppUtils.printLog("Body = " + body);
+			// TODO: if user not, update order MS status with fail and invoke notification
+			// ms service
+			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+		});
+	}
+	
+	private Mono<ServiceException> handleProductNotFoundInInventory(ClientResponse clientResponse, KafkaEventRequest request,
+			String serviceName) {
+		return clientResponse.bodyToMono(String.class).flatMap(body -> {
+			AppUtils.printLog("Error got for, Product not found in the inventory" + serviceName);
+			AppUtils.printLog("Body = " + body);
+			// TODO: if user not, update order MS status with fail and invoke notification
+			// ms service
+			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+		});
+	}
+	
+	private Mono<ServiceException> handleQuantityNotSufficientInInventory(ClientResponse clientResponse, KafkaEventRequest request,
+			String serviceName) {
+		return clientResponse.bodyToMono(String.class).flatMap(body -> {
+			AppUtils.printLog("Error got for, quantity is insufficient in the inventory" + serviceName);
 			AppUtils.printLog("Body = " + body);
 			// TODO: if user not, update order MS status with fail and invoke notification
 			// ms service

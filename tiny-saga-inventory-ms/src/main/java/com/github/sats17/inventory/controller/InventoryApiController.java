@@ -73,7 +73,7 @@ public class InventoryApiController {
 						+ ". Available quantity is " + inventory.get().getProductQuantity());
 				InventoryMsResponse response = new InventoryMsResponse(404,
 						"Quantity is not sufficient for product in inventory.");
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+				return ResponseEntity.status(HttpStatus.GONE).body(response);
 			}
 			AppUtils.printLog("Updated quantity for product with id " + inventory.get().getProductId());
 			InventoryMsResponse response = new InventoryMsResponse(200, "Inventory updated succesfully");

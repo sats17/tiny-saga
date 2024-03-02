@@ -34,7 +34,7 @@ public class KafkaController {
 			AppUtils.printLog("Event recevied = "+eventObj.getEventName());
 			switch (eventObj.getEventName()) {
 			case ORDER_INITIATED:
-				orderService.processOrderInitialization(eventObj);
+				orderService.processOrder(eventObj);
 				break;
 			default:
 				AppUtils.printLog("UNKNOWN Event not supported");
