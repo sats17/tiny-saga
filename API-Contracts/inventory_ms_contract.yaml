@@ -64,6 +64,18 @@ paths:
                   "status": 404,
                   "responseMessage": "Product not found"
                 }
+        '410':
+          description: Quantity is not sufficient for product in inventory
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
+              example: | 
+                {
+                  "status": 410,
+                  "responseMessage": "Quantity is not sufficient for product in inventory"
+                }
         '500':
           description: Server error
           content:
