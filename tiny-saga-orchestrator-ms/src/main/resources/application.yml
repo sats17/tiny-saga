@@ -6,22 +6,22 @@ springdoc.api-docs.path: /orchestrator-docs
 
 spring:
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092
     group_id: orchestrator-ms
     
 services:
   payment:
-    host: localhost
+    host: 172.20.0.6
     port: 8087
     protocol: http
     orderPayPath: "/v2/api/payment/order/pay"
   inventory:
-    host: localhost
+    host: 172.20.0.6
     port: 8088
     protocol: http
     reserveInventoryPath: "/v2/api/inventory/reserve/product/{productId}"
   order:
-    host: localhost
+    host: 172.20.0.6
     port: 8081
     protocol: http
     updateOrderStatusPath: "/v2/api/order/{orderId}/status"

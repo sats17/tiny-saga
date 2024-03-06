@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set the topic name and other configuration
-TOPIC_NAME="order-topic"
+TOPIC_NAME="orchestrator-topic"
 PARTITIONS=1
 REPLICATION_FACTOR=1
 

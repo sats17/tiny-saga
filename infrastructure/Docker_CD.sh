@@ -27,18 +27,18 @@ run_container() {
     local image_name="$2"
     local port_mapping="$3"
     echo "Creating container: $container_name"
-    docker run -itd -p "$port_mapping" --name "$container_name" "$image_name"
+    docker run -itd -p "$port_mapping" --network infrastructure_kafka-network --name "$container_name" "$image_name" 
 }
 
 # Run wallet ms
 delete_container "wallet_ms"
 run_container "wallet_ms" "tiny-saga-wallet-ms" "8086:8086"
 
-# Run payment ms
+# # Run payment ms
 delete_container "payment_ms"
 run_container "payment_ms" "tiny-saga-payment-ms" "8087:8087"
 
-# Run inventory ms
+# # Run inventory ms
 delete_container "inventory_ms"
 run_container "inventory_ms" "tiny-saga-inventory-ms" "8088:8088"
 
