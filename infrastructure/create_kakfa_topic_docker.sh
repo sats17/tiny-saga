@@ -8,7 +8,7 @@ REPLICATION_FACTOR=1
 # Check if the topic already exists
 # It creates a new container which uses kafka network and uses kafka host to connect kafka cluster.
 docker run --rm -it \
-  --network=infrastructure_default \
+  --network=dockerinfra_kafka-network \
   confluentinc/cp-kafka \
   kafka-topics --describe \
     --bootstrap-server kafka:9092 \
@@ -17,7 +17,7 @@ docker run --rm -it \
 # If the topic doesn't exist, create it
 if [ $? -ne 0 ]; then
   docker run --rm -it \
-    --network=infrastructure_default \
+    --network=dockerinfra_kafka-network \
     confluentinc/cp-kafka \
     kafka-topics --create \
       --bootstrap-server kafka:9092 \
