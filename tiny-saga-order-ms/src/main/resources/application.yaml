@@ -19,7 +19,7 @@ spring:
   application:
     name: tiny-saga-order-ms
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: kafka:9092 # 192.168.29.53:9092 # kafka:9092 use this host when running kafka and app in docker
     group_id: order-ms
 
 

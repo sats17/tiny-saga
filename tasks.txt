@@ -6,6 +6,8 @@ Create script or image to run services without STS= Done with local sh
 Create API Gateway from spring cloud, use rate limiting = Pending
 Create load test script = Pending
 Rewrite readme by dividing choreography pattern and orchestrator pattern = pending
+Proper doc for infra setup with differnt way like in local, docker, k8.=pending
+Proper doc for kafka setup and kafka/spring boot connectivity how to do. In docker, in local =pending
 
 Create orchestrator MS with non-blocking IO webflux = ongoing
 How to handle microservice down scenario in orchestration service, like most important if payment ms is down then ? = Pending
@@ -14,3 +16,13 @@ Drawbacks of choreography pattern is that how we will notify customer if any ser
 
 Use grpc for intercommunication in orch architecture = pending ref- https://github.com/grpc-ecosystem/grpc-spring?tab=readme-ov-file https://www.youtube.com/watch?v=2CWYorTWyGs
 Create custom plugin on top of grpc plugin or separate that pull proto file and put into src/main/proto = Not doing. Stopped exploring grpc
+
+
+
+curl --location 'order_ms:8081/v2/api/order' --header 'Content-Type: application/json' \
+--data '{
+    "userId": 1,
+    "productId": "4",
+    "price": 2,
+    "productQuantity": 1
+}'

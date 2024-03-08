@@ -1,6 +1,6 @@
 echo -e "=======================Building JAR for payment ms=======================\n"
 
-cd ..
+cd ../..
 cd tiny-saga-payment-ms
 
 # Run Maven clean install

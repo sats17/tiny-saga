@@ -1,0 +1,89 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - kafka-network
+
+  kafka:
+    image: confluentinc/cp-kafka
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092" # Use this port if your application and kafka are on same docker network
+      - "29092:29092" # Any producer or consumer who wants to connect kafka outside docker network should use this port.
+    environment:
+      KAFKA_BROKER_ID: 1 # Specifies the unique ID of the Kafka broker.
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # Specifies the Zookeeper connection string in the format hostname:port. Zookeeper is used by Kafka for cluster coordination.
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT # Kafka communication protocol without encryption or authentication, suitable for non-sensitive environments.
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092 # Listeners advertised to clients for connecting to Kafka brokers.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - kafka-network
+
+  wallet-ms:
+    image: tiny-saga-wallet-ms
+    ports:
+      - "8086:8086"
+    depends_on:
+      - kafka
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "app.py"]  # This command wait for given endpoint up and running, then start the container.
+    networks:
+      - kafka-network
+
+  payment-ms:
+    image: tiny-saga-payment-ms
+    ports:
+      - "8087:8087"
+    depends_on:
+      - kafka
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "app.py"]  # Adjust your command accordingly
+    networks:
+      - kafka-network
+    environment:
+      WALLET_HOST: wallet-ms
+
+  inventory-ms:
+    image: tiny-saga-inventory-ms
+    ports:
+      - "8088:8088"
+    depends_on:
+      - kafka
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "app.py"]  # Adjust your command accordingly
+    networks:
+      - kafka-network
+
+  order-ms:
+    image: tiny-saga-order-ms
+    ports:
+      - "8081:8081"
+    depends_on:
+      - kafka
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "app.py"]  # Adjust your command accordingly
+    networks:
+      - kafka-network
+
+  orchestrator-ms:
+    image: tiny-saga-orchestrator-ms
+    ports:
+      - "8084:8084"
+    depends_on:
+      - kafka
+    command: ["./wait-for-it.sh", "kafka:9092", "--", "python", "app.py"]  # Adjust your command accordingly
+    networks:
+      - kafka-network
+    environment:
+      PAYMENT_HOST: payment-ms
+      INVENTORY_HOST: inventory-ms
+      ORDER_HOST: order-ms
+
+networks:
+  kafka-network:
