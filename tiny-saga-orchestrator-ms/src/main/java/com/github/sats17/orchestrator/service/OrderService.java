@@ -81,7 +81,7 @@ public class OrderService {
 		ResponseSpec spec = paymentConfig.post(configProperties.getPayment().get("orderPayPath"), requestString);
 		return spec
 				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.NOT_FOUND),
-						clientResponse -> handlePaymentUserNotFound(clientResponse, request, "paymentMs"))
+						clientResponse -> handleUserNotFoundInWalletForPayment(clientResponse, request, "paymentMs"))
 				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.BAD_REQUEST),
 						clientResponse -> handleInsufficientFundInUserWallet(clientResponse, request, "paymentMs"))
 				.onStatus(httpStatus -> httpStatus.is5xxServerError(),
@@ -89,13 +89,48 @@ public class OrderService {
 				.bodyToMono(PaymentMsResponse.class);
 	}
 
-	private Mono<ServiceException> handlePaymentUserNotFound(ClientResponse clientResponse, KafkaEventRequest request,
+	private Mono<PaymentMsResponse> processRefund(KafkaEventRequest request) {
+		PaymentMsRequest paymentMsRequest = new PaymentMsRequest();
+		paymentMsRequest.setOrderId(request.getOrderId());
+		paymentMsRequest.setPrice(request.getPrice());
+		paymentMsRequest.setUserId(request.getUserId());
+
+		String requestString;
+		try {
+			requestString = mapper.writeValueAsString(paymentMsRequest);
+		} catch (JsonProcessingException e) {
+			throw new InternalServerException(e.getMessage());
+		}
+		ResponseSpec spec = paymentConfig.post(configProperties.getPayment().get("orderRefundPath"), requestString);
+		return spec
+				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.NOT_FOUND),
+						clientResponse -> handleUserNotFoundInWalletForRefund(clientResponse, request, "paymentMs"))
+				.onStatus(httpStatus -> httpStatus.is5xxServerError(),
+						clientResponse -> handle5XXError(clientResponse, request, "paymentMs"))
+				.bodyToMono(PaymentMsResponse.class);
+	}
+
+	private Mono<ServiceException> handleUserNotFoundInWalletForPayment(ClientResponse clientResponse,
+			KafkaEventRequest request,
 			String serviceName) {
 		return clientResponse.bodyToMono(String.class).flatMap(body -> {
 			AppUtils.printLog("404 user not found occured from " + serviceName);
 			AppUtils.printLog("Body = " + body);
-			// TODO: if user not, update order MS status with fail and invoke notification
-			// ms service
+			updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.PAYMENT_FAIL,
+					"User is not present or blocked in wallet.").subscribe();
+			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+		});
+	}
+
+	private Mono<ServiceException> handleUserNotFoundInWalletForRefund(ClientResponse clientResponse,
+			KafkaEventRequest request,
+			String serviceName) {
+		AppUtils.printLog("404 user not found occured from " + serviceName);
+		return clientResponse.bodyToMono(String.class).flatMap(body -> {
+
+			AppUtils.printLog("Body = " + body);
+			updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.REFUND_FAIL,
+					"User is not present or blocked in wallet.").subscribe();
 			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
 		});
 	}
@@ -103,8 +138,8 @@ public class OrderService {
 	private Mono<ServiceException> handleInsufficientFundInUserWallet(ClientResponse clientResponse,
 			KafkaEventRequest request,
 			String serviceName) {
-				AppUtils.printLog("400 received, user do to have insufficient fund in wallet " + serviceName);
-				
+		AppUtils.printLog("400 received, user do to have insufficient fund in wallet " + serviceName);
+
 		return clientResponse.bodyToMono(String.class).flatMap(body -> {
 			AppUtils.printLog("Body = " + body);
 			updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.PAYMENT_FAIL,
@@ -159,12 +194,8 @@ public class OrderService {
 				.replacePathParams(configProperties.getOrder().get("updateOrderStatusPath"), params);
 		ResponseSpec spec = orderConfig.put(updateOrderStatusPath, requestString);
 		return spec
-				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.NOT_FOUND),
-						clientResponse -> handlePaymentUserNotFound(clientResponse, request, "paymentMs"))
-				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.BAD_REQUEST),
-						clientResponse -> handleAuthorizationError(clientResponse, request, "paymentMs"))
 				.onStatus(httpStatus -> httpStatus.is5xxServerError(),
-						clientResponse -> handle5XXError(clientResponse, request, "paymentMs"))
+						clientResponse -> handle5XXError(clientResponse, request, "orderMS"))
 				.bodyToMono(OrderMsResponse.class);
 	}
 
@@ -173,9 +204,12 @@ public class OrderService {
 		return clientResponse.bodyToMono(String.class).flatMap(body -> {
 			AppUtils.printLog("Error got for, Product not found in the inventory" + serviceName);
 			AppUtils.printLog("Body = " + body);
-			// TODO: if user not, update order MS status with fail and invoke notification
-			// ms service
-			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+			Mono<OrderMsResponse> updateOrderStatusMono = updateOrderStatus(request.getOrderId(), request,
+					OrchestratorOrderStatus.INVENTORY_INSUFFICIENT,
+					"Product is not available in inventory.");
+			Mono<PaymentMsResponse> processRefundMono = processRefund(request);
+			return Mono.zip(updateOrderStatusMono, processRefundMono)
+					.then(Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body)));
 		});
 	}
 
@@ -184,8 +218,8 @@ public class OrderService {
 		return clientResponse.bodyToMono(String.class).flatMap(body -> {
 			AppUtils.printLog("Error got for, quantity is insufficient in the inventory" + serviceName);
 			AppUtils.printLog("Body = " + body);
-			// TODO: if user not, update order MS status with fail and invoke notification
-			// ms service
+			updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.INVENTORY_INSUFFICIENT,
+					"Product is not available in inventory.").subscribe();
 			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
 		});
 	}

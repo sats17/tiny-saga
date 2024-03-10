@@ -74,6 +74,36 @@ public class PaymentService {
 		}
 	}
 
+	public PaymentMsResponse processRefund(PaymentProcessRequest request) throws WalletException {
+
+		WalletMsResponse response = walletService.creditAmount(walletMsHost + walletMsBasePath, request.getUserId(),
+				request.getPrice());
+		if (response == null) {
+			return new PaymentMsResponse(500, "Server error occured from wallet MS, while crediting amount");
+		} else if (response.getStatus() == 20000) {
+			AppUtils.printLog("Amount credited successfully for userId " + request.getUserId());
+			Transaction transaction = buildTransaction(request, "Amount credit is done", PaymentStatus.REFUND_DONE,
+					TransactionType.DEPOSIT);
+			saveTransactionAsync(transaction);
+			return new PaymentMsResponse(200, "Refund is succesful");
+		} else if (response.getStatus() == 40002) {
+			Transaction transaction = buildTransaction(request,
+					"Refund cannot be proceed, due to user not found in wallet db.", PaymentStatus.REFUND_FAILED,
+					TransactionType.DEPOSIT);
+			saveTransactionAsync(transaction);
+			AppUtils.printLog("Refund cannot be proceed, due to user not found. Repsonse -> " + response.toString());
+			return new PaymentMsResponse(404, "Refund cannot be process, " + response.getResponseMessage());
+		} else {
+			Transaction transaction = buildTransaction(request, "Refund cannot be proceed",
+					PaymentStatus.REFUND_FAILED, TransactionType.DEPOSIT);
+			saveTransactionAsync(transaction);
+			AppUtils.printLog(
+					"Server error occured from wallet MS, while crediting amount. Repsonse -> " + response.toString());
+			return new PaymentMsResponse(500, "Server error occured from wallet MS, while crediting amount");
+
+		}
+	}
+
 	private Transaction buildTransaction(PaymentProcessRequest request, String description, PaymentStatus paymentStatus,
 			TransactionType transactionType) {
 		Transaction transaction = new Transaction();
