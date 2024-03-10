@@ -98,6 +98,7 @@ public class OrderService {
 
 	public void updateOrderStatus(String orderId, OrchestratorOrderStatus status, String orderFailResaon) {
 		Optional<Order> order = orderRepository.findById(orderId);
+		AppUtils.printLog("Received this "+status.toString()+" to update order status");
 		switch (status) {
 		case PAYMENT_DONE:
 			if (order.isPresent()) {
@@ -120,7 +121,7 @@ public class OrderService {
 			}
 			break;
 		case INVENTORY_INSUFFICIENT:
-			AppUtils.printLog("INVENTORY_INSUFFICIENT Event not supported");
+			AppUtils.printLog("INVENTORY_INSUFFICIENT status recived");
 			if (order.isPresent()) {
 				order.get().setPaymentStatus(Enums.PaymentStatus.REFUND_INITIATED);
 				order.get().setUpdateAt(AppUtils.generateEpochTimestamp());
@@ -150,7 +151,18 @@ public class OrderService {
 				order.get().setOrderStatus(Enums.OrderStatus.ORDER_FAIL);
 				order.get().setUpdateAt(AppUtils.generateEpochTimestamp());
 				orderRepository.save(order.get());
-				AppUtils.printLog("PAYMENT_DONE: Updted order status to payment done");
+				AppUtils.printLog("REFUND_DONE: Updted order status to payment done");
+			} else {
+				AppUtils.printLog("Order data not found for orderId: " + orderId);
+			}
+			break;
+		case REFUND_FAIL:
+			if (order.isPresent()) {
+				order.get().setPaymentStatus(Enums.PaymentStatus.REFUND_FAILED);
+				order.get().setOrderStatus(Enums.OrderStatus.ORDER_FAIL);
+				order.get().setUpdateAt(AppUtils.generateEpochTimestamp());
+				orderRepository.save(order.get());
+				AppUtils.printLog("REFUND_FAIL: Updted order status to refund fail done");
 			} else {
 				AppUtils.printLog("Order data not found for orderId: " + orderId);
 			}
