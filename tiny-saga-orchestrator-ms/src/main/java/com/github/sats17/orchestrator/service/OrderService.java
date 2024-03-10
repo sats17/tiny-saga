@@ -53,6 +53,8 @@ public class OrderService {
 	// Based on http error status code decide what to do with order.
 	public void processOrder(KafkaEventRequest request) {
 		Mono<Object> paymentMono = processPayment(request).flatMap(paymentMsResponse -> {
+			AppUtils.printLog(
+					"Success Response recieved from payment, will try to update order status asynchronously.");
 			updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.PAYMENT_DONE, null).subscribe();
 			AppUtils.printLog("Success response recieved from payment, will process inventory");
 			return reserveInventory(request).flatMap(inventoryMsResponse -> updateOrderStatus(request.getOrderId(),
@@ -81,10 +83,34 @@ public class OrderService {
 				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.NOT_FOUND),
 						clientResponse -> handlePaymentUserNotFound(clientResponse, request, "paymentMs"))
 				.onStatus(httpStatus -> httpStatus.isSameCodeAs(HttpStatus.BAD_REQUEST),
-						clientResponse -> handleAuthorizationError(clientResponse, request, "paymentMs"))
+						clientResponse -> handleInsufficientFundInUserWallet(clientResponse, request, "paymentMs"))
 				.onStatus(httpStatus -> httpStatus.is5xxServerError(),
 						clientResponse -> handle5XXError(clientResponse, request, "paymentMs"))
 				.bodyToMono(PaymentMsResponse.class);
+	}
+
+	private Mono<ServiceException> handlePaymentUserNotFound(ClientResponse clientResponse, KafkaEventRequest request,
+			String serviceName) {
+		return clientResponse.bodyToMono(String.class).flatMap(body -> {
+			AppUtils.printLog("404 user not found occured from " + serviceName);
+			AppUtils.printLog("Body = " + body);
+			// TODO: if user not, update order MS status with fail and invoke notification
+			// ms service
+			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+		});
+	}
+
+	private Mono<ServiceException> handleInsufficientFundInUserWallet(ClientResponse clientResponse,
+			KafkaEventRequest request,
+			String serviceName) {
+				AppUtils.printLog("400 received, user do to have insufficient fund in wallet " + serviceName);
+				
+		return clientResponse.bodyToMono(String.class).flatMap(body -> {
+			AppUtils.printLog("Body = " + body);
+			updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.PAYMENT_FAIL,
+					"User do not sufficient fund to place order.").subscribe();
+			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+		});
 	}
 
 	private Mono<InventoryMsResponse> reserveInventory(KafkaEventRequest request) {
@@ -140,17 +166,6 @@ public class OrderService {
 				.onStatus(httpStatus -> httpStatus.is5xxServerError(),
 						clientResponse -> handle5XXError(clientResponse, request, "paymentMs"))
 				.bodyToMono(OrderMsResponse.class);
-	}
-
-	private Mono<ServiceException> handlePaymentUserNotFound(ClientResponse clientResponse, KafkaEventRequest request,
-			String serviceName) {
-		return clientResponse.bodyToMono(String.class).flatMap(body -> {
-			AppUtils.printLog("404 user not found occured from " + serviceName);
-			AppUtils.printLog("Body = " + body);
-			// TODO: if user not, update order MS status with fail and invoke notification
-			// ms service
-			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
-		});
 	}
 
 	private Mono<ServiceException> handleProductNotFoundInInventory(ClientResponse clientResponse,
