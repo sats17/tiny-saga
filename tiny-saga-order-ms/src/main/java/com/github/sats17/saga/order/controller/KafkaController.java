@@ -63,7 +63,7 @@ public class KafkaController {
 				}
 				break;
 			case INVENTORY_INSUFFICIENT:
-				AppUtils.printLog("INVENTORY_INSUFFICIENT Event not supported");
+				AppUtils.printLog("INVENTORY_INSUFFICIENT recieved");
 				if (order.isPresent()) {
 					order.get().setPaymentStatus(Enums.PaymentStatus.REFUND_INITIATED);
 					order.get().setUpdateAt(AppUtils.generateEpochTimestamp());

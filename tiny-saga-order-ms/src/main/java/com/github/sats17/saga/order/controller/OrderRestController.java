@@ -88,6 +88,7 @@ public class OrderRestController {
 	@PutMapping("/v2/api/order/{orderId}/status")
 	public ResponseEntity<BasicOrderMsResponse> updateOrderStatus(@PathVariable String orderId,
 			@RequestBody UpdateOrderStatusSchema data) throws Exception {
+		AppUtils.printLog("Update order status invoked for "+data.getStatus().toString());
 		orderService.updateOrderStatus(orderId, data.getStatus(), data.getOrderFailReason());
 		BasicOrderMsResponse response = new BasicOrderMsResponse(200, "Order updated succesfully");
 		return ResponseEntity.status(HttpStatus.OK).body(response);

@@ -52,6 +52,7 @@ public class OrderService {
 	// http status code.
 	// Based on http error status code decide what to do with order.
 	public void processOrder(KafkaEventRequest request) {
+		AppUtils.printLog("Order process started..");
 		Mono<Object> paymentMono = processPayment(request).flatMap(paymentMsResponse -> {
 			AppUtils.printLog(
 					"Success Response recieved from payment, will try to update order status asynchronously.");
@@ -67,6 +68,7 @@ public class OrderService {
 	}
 
 	private Mono<PaymentMsResponse> processPayment(KafkaEventRequest request) {
+		AppUtils.printLog("Payment process started..");
 		PaymentMsRequest paymentMsRequest = new PaymentMsRequest();
 		paymentMsRequest.setOrderId(request.getOrderId());
 		paymentMsRequest.setPrice(request.getPrice());
@@ -90,6 +92,7 @@ public class OrderService {
 	}
 
 	private Mono<PaymentMsResponse> processRefund(KafkaEventRequest request) {
+		AppUtils.printLog("Refund process started..");
 		PaymentMsRequest paymentMsRequest = new PaymentMsRequest();
 		paymentMsRequest.setOrderId(request.getOrderId());
 		paymentMsRequest.setPrice(request.getPrice());
@@ -209,18 +212,55 @@ public class OrderService {
 					"Product is not available in inventory.");
 			Mono<PaymentMsResponse> processRefundMono = processRefund(request);
 			return Mono.zip(updateOrderStatusMono, processRefundMono)
-					.then(Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body)));
+					.flatMap(result -> {
+						AppUtils.printLog("Got response from update order status and process refund.");
+						if (result.getT2().getStatus() == 200) {
+							AppUtils.printLog("Calling order ms to update refund done status.");
+							return updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.REFUND_DONE,
+									null)
+									.then(Mono.error(
+											new ServiceException(serviceName, clientResponse.statusCode().value(),
+													body)));
+						} else {
+							AppUtils.printLog("Payment ms refund did not return success response => "+result.getT2().getResponseMessage());
+							// TODO: What to do if refund fail ??
+							return Mono.error(
+									new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+						}
+
+					});
+
 		});
 	}
 
 	private Mono<ServiceException> handleQuantityNotSufficientInInventory(ClientResponse clientResponse,
 			KafkaEventRequest request, String serviceName) {
+		AppUtils.printLog("Error got for, quantity is insufficient in the inventory" + serviceName);
 		return clientResponse.bodyToMono(String.class).flatMap(body -> {
-			AppUtils.printLog("Error got for, quantity is insufficient in the inventory" + serviceName);
+
 			AppUtils.printLog("Body = " + body);
-			updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.INVENTORY_INSUFFICIENT,
-					"Product is not available in inventory.").subscribe();
-			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+			Mono<OrderMsResponse> updateOrderStatusMono = updateOrderStatus(request.getOrderId(), request,
+					OrchestratorOrderStatus.INVENTORY_INSUFFICIENT,
+					"Insufficient quantity in inventory.");
+			Mono<PaymentMsResponse> processRefundMono = processRefund(request);
+			return Mono.zip(updateOrderStatusMono, processRefundMono)
+					.flatMap(result -> {
+						AppUtils.printLog("Got response from update order status and process refund.");
+						if (result.getT2().getStatus() == 200) {
+							AppUtils.printLog("Calling order ms to update refund done status.");
+							return updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.REFUND_DONE,
+									null)
+									.then(Mono.error(
+											new ServiceException(serviceName, clientResponse.statusCode().value(),
+													body)));
+						} else {
+							AppUtils.printLog("Payment ms refund did not return success response => "+result.getT2().getResponseMessage());
+							// TODO: What to do if refund fail ??
+							return Mono.error(
+									new ServiceException(serviceName, clientResponse.statusCode().value(), body));
+						}
+
+					});
 		});
 	}
 
