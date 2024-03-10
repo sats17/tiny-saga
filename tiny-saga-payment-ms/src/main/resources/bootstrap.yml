@@ -9,7 +9,7 @@ spring:
     group_id: payment-ms
 
 walletMs:
-  host: http://wallet-ms:8086
+  host: ${WALLET-MS-URL:http://localhost:8086}
   basePath: /v1/api/wallet
   
 isChoreographyEnabled: false

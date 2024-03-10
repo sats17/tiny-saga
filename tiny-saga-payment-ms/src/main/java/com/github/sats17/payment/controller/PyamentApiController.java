@@ -59,7 +59,7 @@ public class PyamentApiController {
 		System.out.println(request.toString());
 		try {
 			PaymentMsResponse response = paymentService.processPayment(request);
-			return ResponseEntity.status(HttpStatus.OK).body(response);
+			return ResponseEntity.status(response.getStatus()).body(response);
 		} catch (WalletException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
