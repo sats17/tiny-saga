@@ -134,7 +134,69 @@ paths:
                   "status": 500,
                   "responseMessage": "Server error occured"
                 }
-          
+
+  /v2/api/payment/order/refund:
+    post:
+      summary: Process Refund for given Order id.  This API Used in Orchestrator saga
+        pattern.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentProcessRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
+              example: |
+               {
+                  "status": 200,
+                  "responseMessage": "Refund processed succesfully"
+                }
+        '401':
+          description: Authorization error
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
+              example: |
+                {
+                  "status": 401,
+                  "responseMessage": "Authorization exception occured"
+                }
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
+              example: |
+                {
+                  "status": 404,
+                  "responseMessage": "User not found in backend"
+                }
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
+              example: |
+                {
+                  "status": 500,
+                  "responseMessage": "Server error occured"
+                }
+         
+
+
 components:
   schemas:
     PaymentProcessRequest:

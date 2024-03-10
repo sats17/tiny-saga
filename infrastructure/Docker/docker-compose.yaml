@@ -50,6 +50,7 @@ services:
       - kafka-network
     environment:
       WALLET_HOST: wallet-ms
+      WALLET-MS-URL: http://wallet-ms:8086
 
   inventory-ms:
     image: tiny-saga-inventory-ms

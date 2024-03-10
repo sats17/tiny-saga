@@ -59,7 +59,20 @@ public class PyamentApiController {
 		System.out.println(request.toString());
 		try {
 			PaymentMsResponse response = paymentService.processPayment(request);
-			return ResponseEntity.status(HttpStatus.OK).body(response);
+			return ResponseEntity.status(response.getStatus()).body(response);
+		} catch (WalletException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@PostMapping("/order/refund")
+	public ResponseEntity<PaymentMsResponse> processRefundForOrderPay(@org.springframework.web.bind.annotation.RequestBody PaymentProcessRequest request) {
+		System.out.println(request.toString());
+		try {
+			PaymentMsResponse response = paymentService.processRefund(request);
+			return ResponseEntity.status(response.getStatus()).body(response);
 		} catch (WalletException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

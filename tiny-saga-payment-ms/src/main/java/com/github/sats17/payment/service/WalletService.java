@@ -44,4 +44,25 @@ public class WalletService {
 		}
 	}
 
+	public WalletMsResponse creditAmount(String url, String userId, Long amount) throws WalletException {
+		URI uri = URI.create(url + "/credit?userId=" + userId + "&amount=" + amount);
+		HttpRequest request = HttpRequest.newBuilder().uri(uri).POST(HttpRequest.BodyPublishers.noBody()).build();
+		AppUtils.printLog("Wallet MS Request URL: " + uri);
+		HttpResponse<String> response;
+		try {
+			response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+			AppUtils.printLog("Wallet MS credit amount Response Code: " + response.statusCode());
+			AppUtils.printLog("Wallet MS credit amount response Body: " + response.body());
+			return mapper.readValue(response.body(), WalletMsResponse.class);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new WalletException(e.getMessage());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new WalletException(e.getMessage());
+		}
+	}
+
 }

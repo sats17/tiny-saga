@@ -11,17 +11,18 @@ spring:
     
 services:
   payment:
-    host: ${PAYMENT_HOST}
+    host: ${PAYMENT_HOST:localhost}
     port: 8087
     protocol: http
     orderPayPath: "/v2/api/payment/order/pay"
+    orderRefundPath:  "/v2/api/payment/order/refund"
   inventory:
-    host: ${INVENTORY_HOST}
+    host: ${INVENTORY_HOST:localhost}
     port: 8088
     protocol: http
     reserveInventoryPath: "/v2/api/inventory/reserve/product/{productId}"
   order:
-    host: ${ORDER_HOST}
+    host: ${ORDER_HOST:localhost}
     port: 8081
     protocol: http
     updateOrderStatusPath: "/v2/api/order/{orderId}/status"
