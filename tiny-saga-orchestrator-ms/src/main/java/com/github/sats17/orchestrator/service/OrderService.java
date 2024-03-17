@@ -246,7 +246,6 @@ public class OrderService {
 			Mono<PaymentMsResponse> processRefundMono = processRefund(request);
 			return Mono.zip(updateOrderStatusMono, processRefundMono)
 					.flatMap(result -> {
-						
 						AppUtils.printLog("Got response from update order status and process refund.");
 						if (result.getT2().getStatus() == 200) {
 							// Update order status after success full payment refund.
@@ -262,7 +261,6 @@ public class OrderService {
 							return Mono.error(
 									new ServiceException(serviceName, clientResponse.statusCode().value(), body));
 						}
-
 					});
 		});
 	}
