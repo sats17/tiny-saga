@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diagram Page</title>
+    <title>Saga Pattern Diagrams</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,10 +11,22 @@
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         h1, h2 {
-            color: #333;
+            margin-top: 40px;
+            color: #007bff;
         }
 
         img {
@@ -22,34 +34,45 @@
             height: auto;
             display: block;
             margin: 20px auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
 
-<h1>Architecture Diagrams</h1>
+<div class="container">
+    <h1>Saga Pattern Architecture Diagrams</h1>
 
-<h1>Orchestration Pattern</h1>
+    <div class="orchestration">
+        <h2>Orchestration Pattern</h2>
+        <div class="orchestration-diagrams">
+            <h3>Create Order Success</h3>
+            <img src="/tiny-saga/diagrams/Orchestration/Order_Flows-Success-Order.drawio.png" alt="Orchestration-CreateOrderSuccess">
 
-<h2>Create Order Success</h2>
-<img src="/tiny-saga/diagrams/Orchestration/Order_Flows-Success-Order.drawio.png" alt="Orchestration-CreateOrderSuccess">
+            <h3>Create Order Inventory Not Available</h3>
+            <img src="/tiny-saga/diagrams/Orchestration/Order_Flows-Inventory_not_available.drawio.png" alt="Orchestration-CreateOrderInventoryNotAvailable">
 
-<h2>Create Order Inventory Not Available</h2>
-<img src="/tiny-saga/diagrams/Orchestration/Order_Flows-Inventory_not_available.drawio.png" alt="Orchestration-CreateOrderInventoryNotAvailable">
+            <h3>Create Order Insufficient Fund</h3>
+            <img src="/tiny-saga/diagrams/Orchestration/Order_Flows-Insufficient_Fund.drawio.png" alt="Orchestration-CreateOrderInsufficientFund">
+        </div>
+    </div>
 
-<h2>Create Order Insufficient Fund</h2>
-<img src="/tiny-saga/diagrams/Orchestration/Order_Flows-Insufficient_Fund.drawio.png" alt="Orchestration-CreateOrderInsufficientFund">
+    <div class="choreography">
+        <h2>Choreography Pattern</h2>
+        <div class="choreography-diagrams">
+            <h3>Create Order Success</h3>
+            <img src="/tiny-saga/diagrams/Success_Order_Flow-Success-Order.drawio.png" alt="CreateOrderSuccess">
 
-<h1>Choreography Pattern</h1>
+            <h3>Create Order Inventory Not Available</h3>
+            <img src="/tiny-saga/diagrams/Success_Order_Flow-Inventory_not_available.drawio.png" alt="CreateOrderInventoryNotAvailable">
 
-<h2>Create Order Success</h2>
-<img src="/tiny-saga/diagrams/Success_Order_Flow-Success-Order.drawio.png" alt="CreateOrderSuccess">
-
-<h2>Create Order Inventory Not Available</h2>
-<img src="/tiny-saga/diagrams/Success_Order_Flow-Inventory_not_available.drawio.png" alt="CreateOrderInventoryNotAvailable">
-
-<h2>Create Order Insufficient Fund</h2>
-<img src="/tiny-saga/diagrams/Success_Order_Flow-Insufficient_Fund.drawio.png" alt="CreateOrderInsufficientFund">
+            <h3>Create Order Insufficient Fund</h3>
+            <img src="/tiny-saga/diagrams/Success_Order_Flow-Insufficient_Fund.drawio.png" alt="CreateOrderInsufficientFund">
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
