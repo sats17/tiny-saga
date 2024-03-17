@@ -147,6 +147,7 @@ public class OrderService {
 			AppUtils.printLog("Body = " + body);
 			updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.PAYMENT_FAIL,
 					"User do not sufficient fund to place order.").subscribe();
+			// TODO: Send notification to user.
 			return Mono.error(new ServiceException(serviceName, clientResponse.statusCode().value(), body));
 		});
 	}
@@ -247,6 +248,7 @@ public class OrderService {
 					.flatMap(result -> {
 						AppUtils.printLog("Got response from update order status and process refund.");
 						if (result.getT2().getStatus() == 200) {
+							// Update order status after success full payment refund.
 							AppUtils.printLog("Calling order ms to update refund done status.");
 							return updateOrderStatus(request.getOrderId(), request, OrchestratorOrderStatus.REFUND_DONE,
 									null)
@@ -259,7 +261,6 @@ public class OrderService {
 							return Mono.error(
 									new ServiceException(serviceName, clientResponse.statusCode().value(), body));
 						}
-
 					});
 		});
 	}
