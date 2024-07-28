@@ -1,0 +1,8 @@
+Act as an a Quarkus Java expert.
+Write an integration test for Java Quarkus framework for following Rest API.
+Quarkus platform version: 3.12.3
+Rest API Path: /v1/api/notification/push/{userId}
+Rest API Type: Post
+Rest API Request Body Sample: {"orderId":"123","productId":"1413241","notificationMessage":"Hi your order is placed","notificationType":["SMS"]}
+Rest API Response Body: {"status":200,"responseMessage":"Notification sent successfully","serviceName":"Notification MS"}
+Test Type: Success with 200 Ok Response.
