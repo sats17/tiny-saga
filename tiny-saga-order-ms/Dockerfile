@@ -1,4 +1,5 @@
-FROM amazoncorretto:17 as builder
+# With builder fetching corretto image temporary to save storage
+FROM amazoncorretto:17 as builder 
 RUN yum update -y
 RUN yum install -y procps
 ARG JAR_FILE=target/*.jar
